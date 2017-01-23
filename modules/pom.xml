@@ -380,50 +380,50 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>integ-setup-dependencies</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>copy</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${skip.integ.tests}</skip>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>org.elasticsearch.distribution.test</groupId>
-                                        <artifactId>elasticsearch</artifactId>
-                                        <version>${elasticsearch.version}</version>
-                                        <type>zip</type>
-                                        <overWrite>true</overWrite>
-                                    </artifactItem>
-                                </artifactItems>
-                                <useBaseVersion>true</useBaseVersion>
-                                <outputDirectory>${integ.deps}</outputDirectory>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.carrotsearch.randomizedtesting</groupId>
-                    <artifactId>junit4-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>integ-tests</id>
-                            <configuration>
-                                <!-- currently only 1 cpu works, because integ tests don't make "unique" test directories? -->
-                                <parallelism>1</parallelism>
-                                <systemProperties>
-                                    <!-- use external cluster -->
-                                    <tests.cluster>localhost:${integ.transport.port}</tests.cluster>
-                                </systemProperties>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>integ-setup-dependencies</id>-->
+                            <!--<phase>pre-integration-test</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>copy</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<skip>${skip.integ.tests}</skip>-->
+                                <!--<artifactItems>-->
+                                    <!--<artifactItem>-->
+                                        <!--<groupId>org.elasticsearch.distribution.test</groupId>-->
+                                        <!--<artifactId>elasticsearch</artifactId>-->
+                                        <!--<version>${elasticsearch.version}</version>-->
+                                        <!--<type>zip</type>-->
+                                        <!--<overWrite>true</overWrite>-->
+                                    <!--</artifactItem>-->
+                                <!--</artifactItems>-->
+                                <!--<useBaseVersion>true</useBaseVersion>-->
+                                <!--<outputDirectory>${integ.deps}</outputDirectory>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
+                <!--<plugin>-->
+                    <!--<groupId>com.carrotsearch.randomizedtesting</groupId>-->
+                    <!--<artifactId>junit4-maven-plugin</artifactId>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>integ-tests</id>-->
+                            <!--<configuration>-->
+                                <!--&lt;!&ndash; currently only 1 cpu works, because integ tests don't make "unique" test directories? &ndash;&gt;-->
+                                <!--<parallelism>1</parallelism>-->
+                                <!--<systemProperties>-->
+                                    <!--&lt;!&ndash; use external cluster &ndash;&gt;-->
+                                    <!--<tests.cluster>localhost:${integ.transport.port}</tests.cluster>-->
+                                <!--</systemProperties>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
     </build>

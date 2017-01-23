@@ -56,36 +56,36 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-remote-resources-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integ-setup-dependencies</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <useBaseVersion>true</useBaseVersion>
-                            <outputDirectory>${integ.deps}/plugins</outputDirectory>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>integ-setup-dependencies</id>-->
+                        <!--<phase>pre-integration-test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<useBaseVersion>true</useBaseVersion>-->
+                            <!--<outputDirectory>${integ.deps}/plugins</outputDirectory>-->
 
-                            <artifactItems>
-                                <!-- elasticsearch distribution -->
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.distribution.zip</groupId>
-                                    <artifactId>elasticsearch</artifactId>
-                                    <version>${elasticsearch.version}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${integ.deps}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                            <!--<artifactItems>-->
+                                <!--&lt;!&ndash; elasticsearch distribution &ndash;&gt;-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.distribution.zip</groupId>-->
+                                    <!--<artifactId>elasticsearch</artifactId>-->
+                                    <!--<version>${elasticsearch.version}</version>-->
+                                    <!--<type>zip</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${integ.deps}</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -31,16 +31,16 @@
 
         <plugins>
             <!-- bundle modules -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-modules</id>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>unpack-modules</id>-->
+                        <!--<phase>prepare-package</phase>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -95,209 +95,209 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <!-- some infos https://github.com/tcurdt/jdeb/blob/master/docs/maven.md -->
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <configuration>
-                    <!-- By default it should generates target/${artifactId}_${version}.deb but we get elasticsearch_2.0.0~SNAPSHOT_all.deb -->
-                    <deb>${project.build.directory}/releases/elasticsearch-${project.version}.deb</deb>
-                    <controlDir>${project.build.directory}/generated-packaging/deb/scripts</controlDir>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jdeb</goal>
-                        </goals>
-                        <configuration>
-                            <signPackage>${deb.sign}</signPackage>
-                            <keyring>${gpg.keyring}</keyring>
-                            <key>${gpg.key}</key>
-                            <passphrase>${gpg.passphrase}</passphrase>
-                            <signMethod>${deb.sign.method}</signMethod>
-                            <dataSet>
-                                <!-- Add bin directory -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/bin</src>
-                                    <type>directory</type>
-                                    <includes>elasticsearch,elasticsearch.in.sh,plugin,elasticsearch-systemd-pre-exec</includes>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.bin.dir}</prefix>
-                                        <filemode>755</filemode>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- create the conf dir manually so it gets proper permissions -->
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>${packaging.elasticsearch.conf.dir}</path>
-                                    </paths>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <filemode>750</filemode>
-                                        <user>root</user>
-                                        <group>elasticsearch</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add configuration files -->
-                                <data>
-                                    <src>${project.basedir}/../src/main/resources/config</src>
-                                    <type>directory</type>
-                                    <excludes>.DS_Store</excludes>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.conf.dir}</prefix>
-                                        <filemode>750</filemode>
-                                        <user>root</user>
-                                        <group>elasticsearch</group>
-                                    </mapper>
-                                </data>
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>${packaging.elasticsearch.conf.dir}/scripts</path>
-                                    </paths>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <filemode>750</filemode>
-                                        <user>root</user>
-                                        <group>elasticsearch</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add environment vars file -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/env/elasticsearch</src>
-                                    <type>file</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>/etc/default</prefix>
-                                        <filemode>644</filemode>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add libs -->
-                                <data>
-                                    <src>${project.build.directory}/</src>
-                                    <includes>elasticsearch-${project.version}.jar</includes>
-                                    <type>directory</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.home.dir}/lib</prefix>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <data>
-                                    <src>${project.build.directory}/../target/lib</src>
-                                    <excludes>${project.build.finalName}-sources.jar,${project.build.finalName}-tests.jar,${project.build.finalName}-test-sources.jar,slf4j-api-*.jar</excludes>
-                                    <type>directory</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.home.dir}/lib</prefix>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add modules -->
-                                <data>
-                                    <src>${project.build.directory}/../target/modules</src>
-                                    <type>directory</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.home.dir}/modules</prefix>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add init.d files  -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/init.d/</src>
-                                    <type>directory</type>
-                                    <excludes>.DS_Store</excludes>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>/etc/init.d</prefix>
-                                        <filemode>755</filemode>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Adds systemd file -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/systemd/elasticsearch.service</src>
-                                    <dst>${packaging.elasticsearch.systemd.dir}/elasticsearch.service</dst>
-                                    <type>file</type>
-                                </data>
-                                <!-- Adds systemd/sysctl.d configuration file -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/systemd/sysctl/elasticsearch.conf</src>
-                                    <dst>${packaging.elasticsearch.systemd.sysctl.dir}/elasticsearch.conf</dst>
-                                    <type>file</type>
-                                </data>
-                                <!-- Adds systemd/tmpfiles.d configuration file -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/systemd/elasticsearch.conf</src>
-                                    <dst>${packaging.elasticsearch.tmpfilesd.dir}/elasticsearch.conf</dst>
-                                    <type>file</type>
-                                </data>
-                                <!-- Add lintian files  -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/lintian</src>
-                                    <type>directory</type>
-                                    <excludes>.DS_Store</excludes>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>/usr/share/lintian/overrides</prefix>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add readme files  -->
-                                <data>
-                                    <src>${project.basedir}/../src/main/resources/</src>
-                                    <includes>*.txt, *.textile</includes>
-                                    <excludes>LICENSE.txt, .DS_Store</excludes>
-                                    <type>directory</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${packaging.elasticsearch.home.dir}</prefix>
-                                        <user>root</user>
-                                        <group>root</group>
-                                    </mapper>
-                                </data>
-                                <!-- Add license files  -->
-                                <data>
-                                    <src>${project.build.directory}/generated-packaging/deb/copyright</src>
-                                    <dst>/usr/share/doc/elasticsearch/copyright</dst>
-                                    <type>file</type>
-                                </data>
-                                <!-- Adds and sets permission on default directories -->
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>${packaging.elasticsearch.data.dir}</path>
-                                        <path>${packaging.elasticsearch.log.dir}</path>
-                                        <path>${packaging.elasticsearch.plugins.dir}</path>
-                                        <path>${packaging.elasticsearch.pid.dir}</path>
-                                    </paths>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <dirmode>755</dirmode>
-                                        <user>${packaging.elasticsearch.user}</user>
-                                        <group>${packaging.elasticsearch.group}</group>
-                                    </mapper>
-                                </data>
-                            </dataSet>
+            <!--<plugin>-->
+                <!--&lt;!&ndash; some infos https://github.com/tcurdt/jdeb/blob/master/docs/maven.md &ndash;&gt;-->
+                <!--<artifactId>jdeb</artifactId>-->
+                <!--<groupId>org.vafer</groupId>-->
+                <!--<configuration>-->
+                    <!--&lt;!&ndash; By default it should generates target/${artifactId}_${version}.deb but we get elasticsearch_2.0.0~SNAPSHOT_all.deb &ndash;&gt;-->
+                    <!--<deb>${project.build.directory}/releases/elasticsearch-${project.version}.deb</deb>-->
+                    <!--<controlDir>${project.build.directory}/generated-packaging/deb/scripts</controlDir>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>jdeb</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<signPackage>${deb.sign}</signPackage>-->
+                            <!--<keyring>${gpg.keyring}</keyring>-->
+                            <!--<key>${gpg.key}</key>-->
+                            <!--<passphrase>${gpg.passphrase}</passphrase>-->
+                            <!--<signMethod>${deb.sign.method}</signMethod>-->
+                            <!--<dataSet>-->
+                                <!--&lt;!&ndash; Add bin directory &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/bin</src>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<includes>elasticsearch,elasticsearch.in.sh,plugin,elasticsearch-systemd-pre-exec</includes>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.bin.dir}</prefix>-->
+                                        <!--<filemode>755</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; create the conf dir manually so it gets proper permissions &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<type>template</type>-->
+                                    <!--<paths>-->
+                                        <!--<path>${packaging.elasticsearch.conf.dir}</path>-->
+                                    <!--</paths>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<filemode>750</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>elasticsearch</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add configuration files &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.basedir}/../src/main/resources/config</src>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<excludes>.DS_Store</excludes>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.conf.dir}</prefix>-->
+                                        <!--<filemode>750</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>elasticsearch</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--<data>-->
+                                    <!--<type>template</type>-->
+                                    <!--<paths>-->
+                                        <!--<path>${packaging.elasticsearch.conf.dir}/scripts</path>-->
+                                    <!--</paths>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<filemode>750</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>elasticsearch</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add environment vars file &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/env/elasticsearch</src>-->
+                                    <!--<type>file</type>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>/etc/default</prefix>-->
+                                        <!--<filemode>644</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add libs &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/</src>-->
+                                    <!--<includes>elasticsearch-${project.version}.jar</includes>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.home.dir}/lib</prefix>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/../target/lib</src>-->
+                                    <!--<excludes>${project.build.finalName}-sources.jar,${project.build.finalName}-tests.jar,${project.build.finalName}-test-sources.jar,slf4j-api-*.jar</excludes>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.home.dir}/lib</prefix>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add modules &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/../target/modules</src>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.home.dir}/modules</prefix>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add init.d files  &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/init.d/</src>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<excludes>.DS_Store</excludes>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>/etc/init.d</prefix>-->
+                                        <!--<filemode>755</filemode>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Adds systemd file &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/systemd/elasticsearch.service</src>-->
+                                    <!--<dst>${packaging.elasticsearch.systemd.dir}/elasticsearch.service</dst>-->
+                                    <!--<type>file</type>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Adds systemd/sysctl.d configuration file &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/systemd/sysctl/elasticsearch.conf</src>-->
+                                    <!--<dst>${packaging.elasticsearch.systemd.sysctl.dir}/elasticsearch.conf</dst>-->
+                                    <!--<type>file</type>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Adds systemd/tmpfiles.d configuration file &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/systemd/elasticsearch.conf</src>-->
+                                    <!--<dst>${packaging.elasticsearch.tmpfilesd.dir}/elasticsearch.conf</dst>-->
+                                    <!--<type>file</type>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add lintian files  &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/lintian</src>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<excludes>.DS_Store</excludes>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>/usr/share/lintian/overrides</prefix>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add readme files  &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.basedir}/../src/main/resources/</src>-->
+                                    <!--<includes>*.txt, *.textile</includes>-->
+                                    <!--<excludes>LICENSE.txt, .DS_Store</excludes>-->
+                                    <!--<type>directory</type>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<prefix>${packaging.elasticsearch.home.dir}</prefix>-->
+                                        <!--<user>root</user>-->
+                                        <!--<group>root</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Add license files  &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<src>${project.build.directory}/generated-packaging/deb/copyright</src>-->
+                                    <!--<dst>/usr/share/doc/elasticsearch/copyright</dst>-->
+                                    <!--<type>file</type>-->
+                                <!--</data>-->
+                                <!--&lt;!&ndash; Adds and sets permission on default directories &ndash;&gt;-->
+                                <!--<data>-->
+                                    <!--<type>template</type>-->
+                                    <!--<paths>-->
+                                        <!--<path>${packaging.elasticsearch.data.dir}</path>-->
+                                        <!--<path>${packaging.elasticsearch.log.dir}</path>-->
+                                        <!--<path>${packaging.elasticsearch.plugins.dir}</path>-->
+                                        <!--<path>${packaging.elasticsearch.pid.dir}</path>-->
+                                    <!--</paths>-->
+                                    <!--<mapper>-->
+                                        <!--<type>perm</type>-->
+                                        <!--<dirmode>755</dirmode>-->
+                                        <!--<user>${packaging.elasticsearch.user}</user>-->
+                                        <!--<group>${packaging.elasticsearch.group}</group>-->
+                                    <!--</mapper>-->
+                                <!--</data>-->
+                            <!--</dataSet>-->
 
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

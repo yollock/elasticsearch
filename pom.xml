@@ -484,10 +484,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--</plugin>-->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
@@ -497,10 +497,10 @@
                     <artifactId>junit4-maven-plugin</artifactId>
                 </plugin>
                 <!-- we only use failsafe's "verify" right now -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+                <!--</plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
@@ -509,10 +509,10 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-remote-resources-plugin</artifactId>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-maven-plugin</artifactId>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>animal-sniffer-maven-plugin</artifactId>-->
+                <!--</plugin>-->
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
@@ -521,24 +521,24 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.3</version>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                            <configuration>
-                                <quiet>true</quiet>
-                                <additionalparam>${doclint.all}</additionalparam>
-                                <additionalparam>${doclint.missing}</additionalparam>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+                    <!--<version>2.10.3</version>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>attach-javadocs</id>-->
+                            <!--<goals>-->
+                                <!--<goal>jar</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<quiet>true</quiet>-->
+                                <!--<additionalparam>${doclint.all}</additionalparam>-->
+                                <!--<additionalparam>${doclint.missing}</additionalparam>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
             </plugins>
         <pluginManagement>
             <plugins>
@@ -635,186 +635,186 @@
                         </compilerArgs>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>com.carrotsearch.randomizedtesting</groupId>
-                    <artifactId>junit4-maven-plugin</artifactId>
-                    <version>${testframework.version}</version>
-                    <!-- general test configuration, used for both unit and integ tests -->
-                    <configuration>
-                        <jvm>${jvm.executable}</jvm>
-                        <argLine>${tests.jvm.argline}</argLine>
-                        <heartbeat>10</heartbeat>
-                        <jvmOutputAction>warn</jvmOutputAction>
-                        <leaveTemporary>true</leaveTemporary>
-                        <parallelism>${tests.jvms}</parallelism>
-                        <!-- System assertions (-esa) are disabled for now because of what looks like a
-                             JDK bug triggered by Groovy on JDK7. We should look at re-enabling system
-                             assertions when we upgrade to a new version of Groovy (currently 2.4.4) or
-                             require JDK8. See https://issues.apache.org/jira/browse/GROOVY-7528.
-                        -->
-                        <assertions enableSystemAssertions="false">
-                            <enable/>
-                            <disable package="${tests.assertion.disabled}"/>
-                            <!-- pass org.elasticsearch to run without assertions -->
-                        </assertions>
-                        <jvmArgs>
-                            <param>-Xmx${tests.heap.size}</param>
-                            <param>-Xms${tests.heap.size}</param>
-                            <param>${java.permGenSpace}</param>
-                            <param>-XX:MaxDirectMemorySize=512m</param>
-                            <param>-Des.logger.prefix=</param>
-                            <param>-XX:+HeapDumpOnOutOfMemoryError</param>
-                            <param>-XX:HeapDumpPath=${tests.heapdump.path}</param>
-                        </jvmArgs>
-                        <shuffleOnSlave>${tests.shuffle}</shuffleOnSlave>
-                        <sysouts>${tests.verbose}</sysouts>
-                        <seed>${tests.seed}</seed>
-                        <!-- enforce unique suite names, or reporting stuff can be screwed up -->
-                        <uniqueSuiteNames>true</uniqueSuiteNames>
-                        <systemProperties>
-                            <!-- we use './temp' since this is per JVM and tests are forbidden from writing to CWD -->
-                            <java.io.tmpdir>./temp</java.io.tmpdir>
-                            <!-- RandomizedTesting library system properties -->
-                            <tests.bwc>${tests.bwc}</tests.bwc>
-                            <tests.bwc.path>${tests.bwc.path}</tests.bwc.path>
-                            <tests.bwc.version>${tests.bwc.version}</tests.bwc.version>
-                            <tests.jvm.argline>${tests.jvm.argline}</tests.jvm.argline>
-                            <tests.appendseed>${tests.appendseed}</tests.appendseed>
-                            <tests.cluster>${tests.cluster}</tests.cluster>
-                            <tests.iters>${tests.iters}</tests.iters>
-                            <tests.project>${project.groupId}:${project.artifactId}</tests.project>
-                            <!-- needed to know which project we are in for plugin permissions -->
-                            <tests.artifact>${project.artifactId}</tests.artifact>
-                            <tests.maxfailures>${tests.maxfailures}</tests.maxfailures>
-                            <tests.failfast>${tests.failfast}</tests.failfast>
-                            <tests.class>${tests.class}</tests.class>
-                            <tests.method>${tests.method}</tests.method>
-                            <tests.nightly>${tests.nightly}</tests.nightly>
-                            <tests.verbose>${tests.verbose}</tests.verbose>
-                            <tests.badapples>${tests.badapples}</tests.badapples>
-                            <tests.weekly>${tests.weekly}</tests.weekly>
-                            <haltOnFailure>${tests.failfast}</haltOnFailure>
-                            <tests.awaitsfix>${tests.awaitsfix}</tests.awaitsfix>
-                            <tests.timeoutSuite>${tests.timeoutSuite}</tests.timeoutSuite>
-                            <tests.showSuccess>${tests.showSuccess}</tests.showSuccess>
-                            <tests.thirdparty>${tests.thirdparty}</tests.thirdparty>
-                            <tests.config>${tests.config}</tests.config>
-                            <tests.coverage>${tests.coverage}</tests.coverage>
-                            <tests.coverage.dir>${project.build.directory}</tests.coverage.dir>
-                            <tests.client.ratio>${tests.client.ratio}</tests.client.ratio>
-                            <tests.enable_mock_modules>${tests.enable_mock_modules}</tests.enable_mock_modules>
-                            <tests.assertion.disabled>${tests.assertion.disabled}</tests.assertion.disabled>
-                            <tests.rest>${tests.rest}</tests.rest>
-                            <tests.rest.suite>${tests.rest.suite}</tests.rest.suite>
-                            <tests.rest.blacklist>${tests.rest.blacklist}</tests.rest.blacklist>
-                            <tests.rest.spec>${tests.rest.spec}</tests.rest.spec>
-                            <tests.network>${tests.network}</tests.network>
-                            <tests.heap.size>${tests.heap.size}</tests.heap.size>
-                            <tests.filter>${tests.filter}</tests.filter>
-                            <tests.version>${elasticsearch.version}</tests.version>
-                            <tests.locale>${tests.locale}</tests.locale>
-                            <tests.rest.load_packaged>${tests.rest.load_packaged}</tests.rest.load_packaged>
-                            <tests.timezone>${tests.timezone}</tests.timezone>
-                            <es.node.local>${env.ES_TEST_LOCAL}</es.node.local>
-                            <es.node.mode>${es.node.mode}</es.node.mode>
-                            <es.logger.level>${es.logger.level}</es.logger.level>
-                            <tests.security.manager>${tests.security.manager}</tests.security.manager>
-                            <tests.compatibility>${tests.compatibility}</tests.compatibility>
-                            <java.awt.headless>true</java.awt.headless>
-                            <!-- true if we are running tests from maven (as opposed to IDE, etc).
-                                 allows us to assert certain things work, like libsigar -->
-                            <tests.maven>true</tests.maven>
-                            <jna.nosys>true</jna.nosys>
-                        </systemProperties>
-                        <listeners>
-                            <report-text
-                                    showThrowable="true"
-                                    showStackTraces="true"
-                                    showOutput="${tests.output}"
-                                    showStatusOk="false"
-                                    showStatusError="true"
-                                    showStatusFailure="true"
-                                    showStatusIgnored="true"
-                                    showSuiteSummary="true"
-                                    showNumFailures="30"
-                                    timestamps="false">
-                                <filtertrace>
-                                    <!-- custom filters: we carefully only omit test infra noise here -->
-                                    <containsstring contains=".SlaveMain." />
-                                    <containsregex pattern="^(\s+at )(org\.junit\.)" />
-                                    <!-- also includes anonymous classes inside these two: -->
-                                    <containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.RandomizedRunner)" />
-                                    <containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.ThreadLeakControl)" />
-                                    <containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.rules\.)" />
-                                    <containsregex pattern="^(\s+at )(org\.apache\.lucene.util\.TestRule)" />
-                                    <containsregex pattern="^(\s+at )(org\.apache\.lucene.util\.AbstractBeforeAfterRule)" />
-                                </filtertrace>
-                            </report-text>
-                        </listeners>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>tests</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>junit4</goal>
-                            </goals>
-                            <configuration>
-                                <ifNoTests>${tests.ifNoTests}</ifNoTests>
-                                <skipTests>${skip.unit.tests}</skipTests>
-                                <listeners>
-                                    <report-ant-xml mavenExtensions="true"
-                                                    dir="${project.build.directory}/surefire-reports"/>
-                                    <report-execution-times historyLength="20"
-                                                            file="${basedir}/${execution.hint.file}"/>
-                                </listeners>
-                                <balancers>
-                                    <execution-times>
-                                        <fileset dir="${basedir}" includes="${execution.hint.file}"/>
-                                    </execution-times>
-                                </balancers>
-                                <includes>
-                                    <include>**/*Tests.class</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>**/*$*.class</exclude>
-                                </excludes>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>integ-tests</id>
-                            <phase>integration-test</phase>
-                            <goals>
-                                <goal>junit4</goal>
-                            </goals>
-                            <configuration>
-                                <ifNoTests>warn</ifNoTests>
-                                <haltOnFailure>false</haltOnFailure>
-                                <skipTests>${skip.integ.tests}</skipTests>
-                                <listeners>
-                                    <report-ant-xml
-                                        mavenExtensions="true"
-                                        summaryFile="${project.build.directory}/failsafe-reports/failsafe-summary.xml"
-                                        dir="${project.build.directory}/failsafe-reports"/>
-                                    <report-execution-times historyLength="20"
-                                                            file="${basedir}/${execution.hint.integ.file}"/>
-                                </listeners>
-                                <balancers>
-                                    <execution-times>
-                                        <fileset dir="${basedir}" includes="${execution.hint.integ.file}"/>
-                                    </execution-times>
-                                </balancers>
-                                <includes>
-                                    <include>**/*IT.class</include>
-                                </includes>
-                                <systemProperties>
-                                    <!-- let framework know we are running integ tests, for correct 'reproduce with' line -->
-                                    <tests.verify.phase>true</tests.verify.phase>
-                                </systemProperties>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>com.carrotsearch.randomizedtesting</groupId>-->
+                    <!--<artifactId>junit4-maven-plugin</artifactId>-->
+                    <!--<version>${testframework.version}</version>-->
+                    <!--&lt;!&ndash; general test configuration, used for both unit and integ tests &ndash;&gt;-->
+                    <!--<configuration>-->
+                        <!--<jvm>${jvm.executable}</jvm>-->
+                        <!--<argLine>${tests.jvm.argline}</argLine>-->
+                        <!--<heartbeat>10</heartbeat>-->
+                        <!--<jvmOutputAction>warn</jvmOutputAction>-->
+                        <!--<leaveTemporary>true</leaveTemporary>-->
+                        <!--<parallelism>${tests.jvms}</parallelism>-->
+                        <!--&lt;!&ndash; System assertions (-esa) are disabled for now because of what looks like a-->
+                             <!--JDK bug triggered by Groovy on JDK7. We should look at re-enabling system-->
+                             <!--assertions when we upgrade to a new version of Groovy (currently 2.4.4) or-->
+                             <!--require JDK8. See https://issues.apache.org/jira/browse/GROOVY-7528.-->
+                        <!--&ndash;&gt;-->
+                        <!--<assertions enableSystemAssertions="false">-->
+                            <!--<enable/>-->
+                            <!--<disable package="${tests.assertion.disabled}"/>-->
+                            <!--&lt;!&ndash; pass org.elasticsearch to run without assertions &ndash;&gt;-->
+                        <!--</assertions>-->
+                        <!--<jvmArgs>-->
+                            <!--<param>-Xmx${tests.heap.size}</param>-->
+                            <!--<param>-Xms${tests.heap.size}</param>-->
+                            <!--<param>${java.permGenSpace}</param>-->
+                            <!--<param>-XX:MaxDirectMemorySize=512m</param>-->
+                            <!--<param>-Des.logger.prefix=</param>-->
+                            <!--<param>-XX:+HeapDumpOnOutOfMemoryError</param>-->
+                            <!--<param>-XX:HeapDumpPath=${tests.heapdump.path}</param>-->
+                        <!--</jvmArgs>-->
+                        <!--<shuffleOnSlave>${tests.shuffle}</shuffleOnSlave>-->
+                        <!--<sysouts>${tests.verbose}</sysouts>-->
+                        <!--<seed>${tests.seed}</seed>-->
+                        <!--&lt;!&ndash; enforce unique suite names, or reporting stuff can be screwed up &ndash;&gt;-->
+                        <!--<uniqueSuiteNames>true</uniqueSuiteNames>-->
+                        <!--<systemProperties>-->
+                            <!--&lt;!&ndash; we use './temp' since this is per JVM and tests are forbidden from writing to CWD &ndash;&gt;-->
+                            <!--<java.io.tmpdir>./temp</java.io.tmpdir>-->
+                            <!--&lt;!&ndash; RandomizedTesting library system properties &ndash;&gt;-->
+                            <!--<tests.bwc>${tests.bwc}</tests.bwc>-->
+                            <!--<tests.bwc.path>${tests.bwc.path}</tests.bwc.path>-->
+                            <!--<tests.bwc.version>${tests.bwc.version}</tests.bwc.version>-->
+                            <!--<tests.jvm.argline>${tests.jvm.argline}</tests.jvm.argline>-->
+                            <!--<tests.appendseed>${tests.appendseed}</tests.appendseed>-->
+                            <!--<tests.cluster>${tests.cluster}</tests.cluster>-->
+                            <!--<tests.iters>${tests.iters}</tests.iters>-->
+                            <!--<tests.project>${project.groupId}:${project.artifactId}</tests.project>-->
+                            <!--&lt;!&ndash; needed to know which project we are in for plugin permissions &ndash;&gt;-->
+                            <!--<tests.artifact>${project.artifactId}</tests.artifact>-->
+                            <!--<tests.maxfailures>${tests.maxfailures}</tests.maxfailures>-->
+                            <!--<tests.failfast>${tests.failfast}</tests.failfast>-->
+                            <!--<tests.class>${tests.class}</tests.class>-->
+                            <!--<tests.method>${tests.method}</tests.method>-->
+                            <!--<tests.nightly>${tests.nightly}</tests.nightly>-->
+                            <!--<tests.verbose>${tests.verbose}</tests.verbose>-->
+                            <!--<tests.badapples>${tests.badapples}</tests.badapples>-->
+                            <!--<tests.weekly>${tests.weekly}</tests.weekly>-->
+                            <!--<haltOnFailure>${tests.failfast}</haltOnFailure>-->
+                            <!--<tests.awaitsfix>${tests.awaitsfix}</tests.awaitsfix>-->
+                            <!--<tests.timeoutSuite>${tests.timeoutSuite}</tests.timeoutSuite>-->
+                            <!--<tests.showSuccess>${tests.showSuccess}</tests.showSuccess>-->
+                            <!--<tests.thirdparty>${tests.thirdparty}</tests.thirdparty>-->
+                            <!--<tests.config>${tests.config}</tests.config>-->
+                            <!--<tests.coverage>${tests.coverage}</tests.coverage>-->
+                            <!--<tests.coverage.dir>${project.build.directory}</tests.coverage.dir>-->
+                            <!--<tests.client.ratio>${tests.client.ratio}</tests.client.ratio>-->
+                            <!--<tests.enable_mock_modules>${tests.enable_mock_modules}</tests.enable_mock_modules>-->
+                            <!--<tests.assertion.disabled>${tests.assertion.disabled}</tests.assertion.disabled>-->
+                            <!--<tests.rest>${tests.rest}</tests.rest>-->
+                            <!--<tests.rest.suite>${tests.rest.suite}</tests.rest.suite>-->
+                            <!--<tests.rest.blacklist>${tests.rest.blacklist}</tests.rest.blacklist>-->
+                            <!--<tests.rest.spec>${tests.rest.spec}</tests.rest.spec>-->
+                            <!--<tests.network>${tests.network}</tests.network>-->
+                            <!--<tests.heap.size>${tests.heap.size}</tests.heap.size>-->
+                            <!--<tests.filter>${tests.filter}</tests.filter>-->
+                            <!--<tests.version>${elasticsearch.version}</tests.version>-->
+                            <!--<tests.locale>${tests.locale}</tests.locale>-->
+                            <!--<tests.rest.load_packaged>${tests.rest.load_packaged}</tests.rest.load_packaged>-->
+                            <!--<tests.timezone>${tests.timezone}</tests.timezone>-->
+                            <!--<es.node.local>${env.ES_TEST_LOCAL}</es.node.local>-->
+                            <!--<es.node.mode>${es.node.mode}</es.node.mode>-->
+                            <!--<es.logger.level>${es.logger.level}</es.logger.level>-->
+                            <!--<tests.security.manager>${tests.security.manager}</tests.security.manager>-->
+                            <!--<tests.compatibility>${tests.compatibility}</tests.compatibility>-->
+                            <!--<java.awt.headless>true</java.awt.headless>-->
+                            <!--&lt;!&ndash; true if we are running tests from maven (as opposed to IDE, etc).-->
+                                 <!--allows us to assert certain things work, like libsigar &ndash;&gt;-->
+                            <!--<tests.maven>true</tests.maven>-->
+                            <!--<jna.nosys>true</jna.nosys>-->
+                        <!--</systemProperties>-->
+                        <!--<listeners>-->
+                            <!--<report-text-->
+                                    <!--showThrowable="true"-->
+                                    <!--showStackTraces="true"-->
+                                    <!--showOutput="${tests.output}"-->
+                                    <!--showStatusOk="false"-->
+                                    <!--showStatusError="true"-->
+                                    <!--showStatusFailure="true"-->
+                                    <!--showStatusIgnored="true"-->
+                                    <!--showSuiteSummary="true"-->
+                                    <!--showNumFailures="30"-->
+                                    <!--timestamps="false">-->
+                                <!--<filtertrace>-->
+                                    <!--&lt;!&ndash; custom filters: we carefully only omit test infra noise here &ndash;&gt;-->
+                                    <!--<containsstring contains=".SlaveMain." />-->
+                                    <!--<containsregex pattern="^(\s+at )(org\.junit\.)" />-->
+                                    <!--&lt;!&ndash; also includes anonymous classes inside these two: &ndash;&gt;-->
+                                    <!--<containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.RandomizedRunner)" />-->
+                                    <!--<containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.ThreadLeakControl)" />-->
+                                    <!--<containsregex pattern="^(\s+at )(com\.carrotsearch\.randomizedtesting.rules\.)" />-->
+                                    <!--<containsregex pattern="^(\s+at )(org\.apache\.lucene.util\.TestRule)" />-->
+                                    <!--<containsregex pattern="^(\s+at )(org\.apache\.lucene.util\.AbstractBeforeAfterRule)" />-->
+                                <!--</filtertrace>-->
+                            <!--</report-text>-->
+                        <!--</listeners>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>tests</id>-->
+                            <!--<phase>test</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>junit4</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<ifNoTests>${tests.ifNoTests}</ifNoTests>-->
+                                <!--<skipTests>${skip.unit.tests}</skipTests>-->
+                                <!--<listeners>-->
+                                    <!--<report-ant-xml mavenExtensions="true"-->
+                                                    <!--dir="${project.build.directory}/surefire-reports"/>-->
+                                    <!--<report-execution-times historyLength="20"-->
+                                                            <!--file="${basedir}/${execution.hint.file}"/>-->
+                                <!--</listeners>-->
+                                <!--<balancers>-->
+                                    <!--<execution-times>-->
+                                        <!--<fileset dir="${basedir}" includes="${execution.hint.file}"/>-->
+                                    <!--</execution-times>-->
+                                <!--</balancers>-->
+                                <!--<includes>-->
+                                    <!--<include>**/*Tests.class</include>-->
+                                <!--</includes>-->
+                                <!--<excludes>-->
+                                    <!--<exclude>**/*$*.class</exclude>-->
+                                <!--</excludes>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<id>integ-tests</id>-->
+                            <!--<phase>integration-test</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>junit4</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<ifNoTests>warn</ifNoTests>-->
+                                <!--<haltOnFailure>false</haltOnFailure>-->
+                                <!--<skipTests>${skip.integ.tests}</skipTests>-->
+                                <!--<listeners>-->
+                                    <!--<report-ant-xml-->
+                                        <!--mavenExtensions="true"-->
+                                        <!--summaryFile="${project.build.directory}/failsafe-reports/failsafe-summary.xml"-->
+                                        <!--dir="${project.build.directory}/failsafe-reports"/>-->
+                                    <!--<report-execution-times historyLength="20"-->
+                                                            <!--file="${basedir}/${execution.hint.integ.file}"/>-->
+                                <!--</listeners>-->
+                                <!--<balancers>-->
+                                    <!--<execution-times>-->
+                                        <!--<fileset dir="${basedir}" includes="${execution.hint.integ.file}"/>-->
+                                    <!--</execution-times>-->
+                                <!--</balancers>-->
+                                <!--<includes>-->
+                                    <!--<include>**/*IT.class</include>-->
+                                <!--</includes>-->
+                                <!--<systemProperties>-->
+                                    <!--&lt;!&ndash; let framework know we are running integ tests, for correct 'reproduce with' line &ndash;&gt;-->
+                                    <!--<tests.verify.phase>true</tests.verify.phase>-->
+                                <!--</systemProperties>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
                 <!-- disable surefire, we use junit4 -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -824,23 +824,23 @@
                         <skip>true</skip>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.18.1</version>
-                    <configuration>
-                        <skip>${skip.integ.tests}</skip>
-                        <failIfNoTests>true</failIfNoTests>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>verify</id>
-                            <goals>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-failsafe-plugin</artifactId>-->
+                    <!--<version>2.18.1</version>-->
+                    <!--<configuration>-->
+                        <!--<skip>${skip.integ.tests}</skip>-->
+                        <!--<failIfNoTests>true</failIfNoTests>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>verify</id>-->
+                            <!--<goals>-->
+                                <!--<goal>verify</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
@@ -876,87 +876,87 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.14</version>
-                    <configuration>
-                        <signature>
-                            <groupId>org.codehaus.mojo.signature</groupId>
-                            <artifactId>java17</artifactId>
-                            <version>1.0</version>
-                        </signature>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-java17</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>de.thetaphi</groupId>
-                    <artifactId>forbiddenapis</artifactId>
-                    <version>2.0</version>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>animal-sniffer-maven-plugin</artifactId>-->
+                    <!--<version>1.14</version>-->
+                    <!--<configuration>-->
+                        <!--<signature>-->
+                            <!--<groupId>org.codehaus.mojo.signature</groupId>-->
+                            <!--<artifactId>java17</artifactId>-->
+                            <!--<version>1.0</version>-->
+                        <!--</signature>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>check-java17</id>-->
+                            <!--<phase>compile</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>check</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
+                <!--<plugin>-->
+                    <!--<groupId>de.thetaphi</groupId>-->
+                    <!--<artifactId>forbiddenapis</artifactId>-->
+                    <!--<version>2.0</version>-->
 
-                    <executions>
-                        <execution>
-                            <id>check-forbidden-apis</id>
-                                <configuration>
-                                     <targetVersion>${maven.compiler.target}</targetVersion>
-                                     <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                     <internalRuntimeForbidden>true</internalRuntimeForbidden>
-                                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                     <bundledSignatures>
-                                         <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                         <bundledSignature>jdk-unsafe</bundledSignature>
-                                         <bundledSignature>jdk-deprecated</bundledSignature>
-                                         <bundledSignature>jdk-system-out</bundledSignature>
-                                     </bundledSignatures>
-                                     <signaturesFiles>
-                                          <signaturesFile>${elasticsearch.tools.directory}/forbidden/core-signatures.txt</signaturesFile>
-                                          <signaturesFile>${elasticsearch.tools.directory}/forbidden/all-signatures.txt</signaturesFile>
-                                          <signaturesFile>${elasticsearch.tools.directory}/forbidden/third-party-signatures.txt</signaturesFile>
-                                     </signaturesFiles>
-                                     <signatures>${forbidden.signatures}</signatures>
-                                     <suppressAnnotations><annotation>**.SuppressForbidden</annotation></suppressAnnotations>
-                                 </configuration>
-                             <phase>compile</phase>
-                             <goals>
-                                 <goal>check</goal>
-                             </goals>
-                         </execution>
-                         <execution>
-                             <id>check-forbidden-test-apis</id>
-                             <configuration>
-                                 <targetVersion>${maven.compiler.target}</targetVersion>
-                                 <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                                 <internalRuntimeForbidden>true</internalRuntimeForbidden>
-                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                                 <bundledSignatures>
-                                     <!-- This will automatically choose the right signatures based on 'targetVersion': -->
-                                     <bundledSignature>jdk-unsafe</bundledSignature>
-                                     <bundledSignature>jdk-deprecated</bundledSignature>
-                                 </bundledSignatures>
-                                 <signaturesFiles>
-                                     <signaturesFile>${elasticsearch.tools.directory}/forbidden/test-signatures.txt</signaturesFile>
-                                     <signaturesFile>${elasticsearch.tools.directory}/forbidden/all-signatures.txt</signaturesFile>
-                                 </signaturesFiles>
-                                 <signatures>${forbidden.test.signatures}</signatures>
-                                 <suppressAnnotations><annotation>**.SuppressForbidden</annotation></suppressAnnotations>
-                             </configuration>
-                             <phase>test-compile</phase>
-                             <goals>
-                                 <goal>testCheck</goal>
-                             </goals>
-                        </execution>
-                    </executions>
-                </plugin>
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>check-forbidden-apis</id>-->
+                                <!--<configuration>-->
+                                     <!--<targetVersion>${maven.compiler.target}</targetVersion>-->
+                                     <!--&lt;!&ndash; disallow undocumented classes like sun.misc.Unsafe: &ndash;&gt;-->
+                                     <!--<internalRuntimeForbidden>true</internalRuntimeForbidden>-->
+                                     <!--&lt;!&ndash; if the used Java version is too new, don't fail, just do nothing: &ndash;&gt;-->
+                                     <!--<failOnUnsupportedJava>false</failOnUnsupportedJava>-->
+                                     <!--<bundledSignatures>-->
+                                         <!--&lt;!&ndash; This will automatically choose the right signatures based on 'targetVersion': &ndash;&gt;-->
+                                         <!--<bundledSignature>jdk-unsafe</bundledSignature>-->
+                                         <!--<bundledSignature>jdk-deprecated</bundledSignature>-->
+                                         <!--<bundledSignature>jdk-system-out</bundledSignature>-->
+                                     <!--</bundledSignatures>-->
+                                     <!--<signaturesFiles>-->
+                                          <!--<signaturesFile>${elasticsearch.tools.directory}/forbidden/core-signatures.txt</signaturesFile>-->
+                                          <!--<signaturesFile>${elasticsearch.tools.directory}/forbidden/all-signatures.txt</signaturesFile>-->
+                                          <!--<signaturesFile>${elasticsearch.tools.directory}/forbidden/third-party-signatures.txt</signaturesFile>-->
+                                     <!--</signaturesFiles>-->
+                                     <!--<signatures>${forbidden.signatures}</signatures>-->
+                                     <!--<suppressAnnotations><annotation>**.SuppressForbidden</annotation></suppressAnnotations>-->
+                                 <!--</configuration>-->
+                             <!--<phase>compile</phase>-->
+                             <!--<goals>-->
+                                 <!--<goal>check</goal>-->
+                             <!--</goals>-->
+                         <!--</execution>-->
+                         <!--<execution>-->
+                             <!--<id>check-forbidden-test-apis</id>-->
+                             <!--<configuration>-->
+                                 <!--<targetVersion>${maven.compiler.target}</targetVersion>-->
+                                 <!--&lt;!&ndash; disallow undocumented classes like sun.misc.Unsafe: &ndash;&gt;-->
+                                 <!--<internalRuntimeForbidden>true</internalRuntimeForbidden>-->
+                                 <!--&lt;!&ndash; if the used Java version is too new, don't fail, just do nothing: &ndash;&gt;-->
+                                 <!--<failOnUnsupportedJava>false</failOnUnsupportedJava>-->
+                                 <!--<bundledSignatures>-->
+                                     <!--&lt;!&ndash; This will automatically choose the right signatures based on 'targetVersion': &ndash;&gt;-->
+                                     <!--<bundledSignature>jdk-unsafe</bundledSignature>-->
+                                     <!--<bundledSignature>jdk-deprecated</bundledSignature>-->
+                                 <!--</bundledSignatures>-->
+                                 <!--<signaturesFiles>-->
+                                     <!--<signaturesFile>${elasticsearch.tools.directory}/forbidden/test-signatures.txt</signaturesFile>-->
+                                     <!--<signaturesFile>${elasticsearch.tools.directory}/forbidden/all-signatures.txt</signaturesFile>-->
+                                 <!--</signaturesFiles>-->
+                                 <!--<signatures>${forbidden.test.signatures}</signatures>-->
+                                 <!--<suppressAnnotations><annotation>**.SuppressForbidden</annotation></suppressAnnotations>-->
+                             <!--</configuration>-->
+                             <!--<phase>test-compile</phase>-->
+                             <!--<goals>-->
+                                 <!--<goal>testCheck</goal>-->
+                             <!--</goals>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
                 <plugin>
                     <!-- We just declare which plugin version to use. Each project can have then its own settings -->
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1000,14 +1000,14 @@
                         <doUpdate>false</doUpdate>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <!-- We just declare which plugin version to use. Each project can have then its own settings -->
-                    <!-- some infos https://github.com/tcurdt/jdeb/blob/master/docs/maven.md -->
-                    <groupId>org.vafer</groupId>
-                    <artifactId>jdeb</artifactId>
-                    <version>1.4</version>
-                    <extensions>true</extensions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--&lt;!&ndash; We just declare which plugin version to use. Each project can have then its own settings &ndash;&gt;-->
+                    <!--&lt;!&ndash; some infos https://github.com/tcurdt/jdeb/blob/master/docs/maven.md &ndash;&gt;-->
+                    <!--<groupId>org.vafer</groupId>-->
+                    <!--<artifactId>jdeb</artifactId>-->
+                    <!--<version>1.4</version>-->
+                    <!--<extensions>true</extensions>-->
+                <!--</plugin>-->
                 <plugin>
                     <!-- We just declare which plugin version to use. Each project can have then its own settings -->
                     <groupId>org.codehaus.mojo</groupId>
@@ -1037,35 +1037,35 @@
                     </configuration>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>1.8</version>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.codehaus.mojo</groupId>-->
+                    <!--<artifactId>license-maven-plugin</artifactId>-->
+                    <!--<version>1.8</version>-->
+                <!--</plugin>-->
 
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>2.5</version>
-                    <configuration>
-                        <header>${elasticsearch.license.header}</header>
-                        <headerDefinitions>
-                            <headerDefinition>${elasticsearch.license.headerDefinition}</headerDefinition>
-                        </headerDefinitions>
-                        <includes>
-                            <include>src/**/*.java</include>
-                        </includes>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-license-headers</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                     </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>com.mycila</groupId>-->
+                    <!--<artifactId>license-maven-plugin</artifactId>-->
+                    <!--<version>2.5</version>-->
+                    <!--<configuration>-->
+                        <!--<header>${elasticsearch.license.header}</header>-->
+                        <!--<headerDefinitions>-->
+                            <!--<headerDefinition>${elasticsearch.license.headerDefinition}</headerDefinition>-->
+                        <!--</headerDefinitions>-->
+                        <!--<includes>-->
+                            <!--<include>src/**/*.java</include>-->
+                        <!--</includes>-->
+                    <!--</configuration>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>check-license-headers</id>-->
+                            <!--<phase>compile</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>check</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                     <!--</executions>-->
+                <!--</plugin>-->
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1182,138 +1182,138 @@ org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UT
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
-                    <executions>
-                        <execution>
-                            <id>set-permgen</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target>
-                                    <!-- if we are on java 1.7.* we set perm gen space since some tests need it otherwise we just inject a dummy value -->
-                                    <condition property="java.permGenSpace" value="-XX:MaxPermSize=128m" else="-Dsome.dummy.value=" >
-                                        <matches pattern="1\.7\..+$" string="${java.runtime.version}" />
-                                    </condition>
-                                </target>
-                                <exportAntProperties>true</exportAntProperties>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>check-invalid-patterns</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target unless="${validate.skip}">
-                                    <pathconvert pathsep="${line.separator}" dirsep="/" property="validate.patternsFound" setonempty="false">
-                                        <fileset dir="${basedir}">
-                                            <include name="**/*.java"/>
-                                            <include name="**/*.py"/>
-                                            <include name="**/*.txt"/>
-                                            <include name="**/*.xml"/>
-                                            <include name="**/*.rb"/>
-                                            <include name="**/*.pl"/>
-                                            <exclude name="**/org/elasticsearch/cluster/routing/shard_routes.txt"/>
-                                            <exclude name="**/build/**/*"/>
-                                            <exclude name="**/target/**/*"/>
-                                            <exclude name="**/.metadata/**/*"/>
-                                            <exclude name="**/.idea/**/*"/>
-                                            <exclude name="**/eclipse-build/**/*"/>
-                                            <or>
-                                                <containsregexp expression="\t" casesensitive="no"/>
-                                                <containsregexp expression="${no.commit.pattern}" casesensitive="no"/>
-                                            </or>
-                                        </fileset>
-                                        <map from="${basedir}${file.separator}" to="* "/>
-                                    </pathconvert>
-                                    <fail if="validate.patternsFound">The following files contain tabs or
-                                        nocommits:${line.separator}${validate.patternsFound}
-                                    </fail>
-                                </target>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <phase>generate-test-resources</phase>
-                            <id>create-heapdump-directory</id>
-                            <configuration>
-                                <target>
-                                    <echo taskname="heapdump" message="Creating heapdump directory"/>
-                                    <mkdir dir="${tests.heapdump.path}"/>
-                                </target>
-                            </configuration>
-                            <goals>
-                                 <goal>run</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>tests-top-hints</id>
-                            <phase>test</phase>
-                            <configuration>
-                                <skip>${skip.unit.tests}</skip>
-                                <target>
-                                    <taskdef resource="com/carrotsearch/junit4/antlib.xml" classpathref="maven.plugin.classpath"/>
-                                    <tophints max="${tests.topn}">
-                                        <fileset dir="${basedir}" includes="${execution.hint.file}"/>
-                                    </tophints>
-                                </target>
-                            </configuration>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>integ-tests-top-hints</id>
-                            <phase>integration-test</phase>
-                            <configuration>
-                                <skip>${skip.integ.tests}</skip>
-                                <target>
-                                    <taskdef resource="com/carrotsearch/junit4/antlib.xml" classpathref="maven.plugin.classpath"/>
-                                    <tophints max="${tests.topn}">
-                                        <fileset dir="${basedir}" includes="${execution.hint.integ.file}"/>
-                                    </tophints>
-                                </target>
-                            </configuration>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>check-license</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <skip>${skip.integ.tests}</skip>
-                                <target>
-                                    <echo taskName="license check">Running license check</echo>
-                                    <!-- don't run on windows, because everyone hates it -->
-                                    <exec failonerror="true" executable="perl" osfamily="unix"
-                                          dir="${elasticsearch.tools.directory}/license-check">
-                                        <arg value="check_license_and_sha.pl"/>
-                                        <arg value="--check"/>
-                                        <arg value="${project.licenses.dir}"/>
-                                        <arg value="${project.licenses.check_target}"/>
-                                        <arg value="${project.licenses.ignore}"/>
-                                    </exec>
-                                </target>
-                            </configuration>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.carrotsearch.randomizedtesting</groupId>
-                            <artifactId>junit4-ant</artifactId>
-                            <version>${testframework.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-antrun-plugin</artifactId>-->
+                    <!--<version>1.8</version>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>set-permgen</id>-->
+                            <!--<phase>validate</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<target>-->
+                                    <!--&lt;!&ndash; if we are on java 1.7.* we set perm gen space since some tests need it otherwise we just inject a dummy value &ndash;&gt;-->
+                                    <!--<condition property="java.permGenSpace" value="-XX:MaxPermSize=128m" else="-Dsome.dummy.value=" >-->
+                                        <!--<matches pattern="1\.7\..+$" string="${java.runtime.version}" />-->
+                                    <!--</condition>-->
+                                <!--</target>-->
+                                <!--<exportAntProperties>true</exportAntProperties>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<id>check-invalid-patterns</id>-->
+                            <!--<phase>validate</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<target unless="${validate.skip}">-->
+                                    <!--<pathconvert pathsep="${line.separator}" dirsep="/" property="validate.patternsFound" setonempty="false">-->
+                                        <!--<fileset dir="${basedir}">-->
+                                            <!--<include name="**/*.java"/>-->
+                                            <!--<include name="**/*.py"/>-->
+                                            <!--<include name="**/*.txt"/>-->
+                                            <!--<include name="**/*.xml"/>-->
+                                            <!--<include name="**/*.rb"/>-->
+                                            <!--<include name="**/*.pl"/>-->
+                                            <!--<exclude name="**/org/elasticsearch/cluster/routing/shard_routes.txt"/>-->
+                                            <!--<exclude name="**/build/**/*"/>-->
+                                            <!--<exclude name="**/target/**/*"/>-->
+                                            <!--<exclude name="**/.metadata/**/*"/>-->
+                                            <!--<exclude name="**/.idea/**/*"/>-->
+                                            <!--<exclude name="**/eclipse-build/**/*"/>-->
+                                            <!--<or>-->
+                                                <!--<containsregexp expression="\t" casesensitive="no"/>-->
+                                                <!--<containsregexp expression="${no.commit.pattern}" casesensitive="no"/>-->
+                                            <!--</or>-->
+                                        <!--</fileset>-->
+                                        <!--<map from="${basedir}${file.separator}" to="* "/>-->
+                                    <!--</pathconvert>-->
+                                    <!--<fail if="validate.patternsFound">The following files contain tabs or-->
+                                        <!--nocommits:${line.separator}${validate.patternsFound}-->
+                                    <!--</fail>-->
+                                <!--</target>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<phase>generate-test-resources</phase>-->
+                            <!--<id>create-heapdump-directory</id>-->
+                            <!--<configuration>-->
+                                <!--<target>-->
+                                    <!--<echo taskname="heapdump" message="Creating heapdump directory"/>-->
+                                    <!--<mkdir dir="${tests.heapdump.path}"/>-->
+                                <!--</target>-->
+                            <!--</configuration>-->
+                            <!--<goals>-->
+                                 <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<id>tests-top-hints</id>-->
+                            <!--<phase>test</phase>-->
+                            <!--<configuration>-->
+                                <!--<skip>${skip.unit.tests}</skip>-->
+                                <!--<target>-->
+                                    <!--<taskdef resource="com/carrotsearch/junit4/antlib.xml" classpathref="maven.plugin.classpath"/>-->
+                                    <!--<tophints max="${tests.topn}">-->
+                                        <!--<fileset dir="${basedir}" includes="${execution.hint.file}"/>-->
+                                    <!--</tophints>-->
+                                <!--</target>-->
+                            <!--</configuration>-->
+                            <!--<goals>-->
+                                <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<id>integ-tests-top-hints</id>-->
+                            <!--<phase>integration-test</phase>-->
+                            <!--<configuration>-->
+                                <!--<skip>${skip.integ.tests}</skip>-->
+                                <!--<target>-->
+                                    <!--<taskdef resource="com/carrotsearch/junit4/antlib.xml" classpathref="maven.plugin.classpath"/>-->
+                                    <!--<tophints max="${tests.topn}">-->
+                                        <!--<fileset dir="${basedir}" includes="${execution.hint.integ.file}"/>-->
+                                    <!--</tophints>-->
+                                <!--</target>-->
+                            <!--</configuration>-->
+                            <!--<goals>-->
+                                <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                        <!--</execution>-->
+                        <!--<execution>-->
+                            <!--<id>check-license</id>-->
+                            <!--<phase>verify</phase>-->
+                            <!--<goals>-->
+                                <!--<goal>run</goal>-->
+                            <!--</goals>-->
+                            <!--<configuration>-->
+                                <!--<skip>${skip.integ.tests}</skip>-->
+                                <!--<target>-->
+                                    <!--<echo taskName="license check">Running license check</echo>-->
+                                    <!--&lt;!&ndash; don't run on windows, because everyone hates it &ndash;&gt;-->
+                                    <!--<exec failonerror="true" executable="perl" osfamily="unix"-->
+                                          <!--dir="${elasticsearch.tools.directory}/license-check">-->
+                                        <!--<arg value="check_license_and_sha.pl"/>-->
+                                        <!--<arg value="&#45;&#45;check"/>-->
+                                        <!--<arg value="${project.licenses.dir}"/>-->
+                                        <!--<arg value="${project.licenses.check_target}"/>-->
+                                        <!--<arg value="${project.licenses.ignore}"/>-->
+                                    <!--</exec>-->
+                                <!--</target>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                    <!--<dependencies>-->
+                        <!--<dependency>-->
+                            <!--<groupId>com.carrotsearch.randomizedtesting</groupId>-->
+                            <!--<artifactId>junit4-ant</artifactId>-->
+                            <!--<version>${testframework.version}</version>-->
+                        <!--</dependency>-->
+                    <!--</dependencies>-->
+                <!--</plugin>-->
                 <plugin>
                     <!-- We just declare which plugin version to use. Each project can have then its own settings -->
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1367,25 +1367,25 @@ org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UT
             <build>
                 <!-- sign the artifacts with GPG -->
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <keyname>${gpg.key}</keyname>
-                                    <passphrase>${gpg.passphrase}</passphrase>
-                                    <defaultKeyring>${gpg.keyring}</defaultKeyring>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-gpg-plugin</artifactId>-->
+                        <!--<version>1.6</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>sign-artifacts</id>-->
+                                <!--<phase>verify</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>sign</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<keyname>${gpg.key}</keyname>-->
+                                    <!--<passphrase>${gpg.passphrase}</passphrase>-->
+                                    <!--<defaultKeyring>${gpg.keyring}</defaultKeyring>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
                 </plugins>
             </build>
         </profile>
@@ -1511,10 +1511,10 @@ org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UT
             </properties>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                    <!--</plugin>-->
                 </plugins>
             </build>
             <reporting>
@@ -1523,26 +1523,26 @@ org.eclipse.jdt.ui.text.custom_code_templates=<?xml version\="1.0" encoding\="UT
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jxr-plugin</artifactId>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-pmd-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <version>2.7</version>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>index</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-pmd-plugin</artifactId>-->
+                    <!--</plugin>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>findbugs-maven-plugin</artifactId>-->
+                    <!--</plugin>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-project-info-reports-plugin</artifactId>-->
+                        <!--<version>2.7</version>-->
+                        <!--<reportSets>-->
+                            <!--<reportSet>-->
+                                <!--<reports>-->
+                                    <!--<report>index</report>-->
+                                <!--</reports>-->
+                            <!--</reportSet>-->
+                        <!--</reportSets>-->
+                    <!--</plugin>-->
                 </plugins>
             </reporting>
         </profile>

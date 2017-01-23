@@ -49,98 +49,98 @@
         </testResources>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integ-setup-dependencies</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <useBaseVersion>true</useBaseVersion>
-                            <outputDirectory>${integ.deps}/plugins</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.distribution.tar</groupId>
-                                    <artifactId>elasticsearch</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>tar.gz</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${tests.bwc.path}</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.distribution.tar</groupId>
-                                    <artifactId>elasticsearch</artifactId>
-                                    <version>${tests.bwc.version}</version>
-                                    <type>tar.gz</type>
-                                    <outputDirectory>${tests.bwc.path}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <executions>
-                    <execution>
-                        <id>start-external-node-service</id>
-                        <!-- Here we use exec:java with cleanupDaemonThreads=false and noblock
-                            to _start_ ExternalNodeService and let it run until the build ends. -->
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <mainClass>org.elasticsearch.test.ExternalNodeService</mainClass>
-                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                            <arguments>
-                                <argument>${basedir}/${tests.bwc.path}</argument>
-                                <argument>noblock</argument>
-                            </arguments>
-                            <!-- Use the test scop to pick up log4j configuration -->
-                            <classpathScope>test</classpathScope>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-external-node-service</id>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <phase>post-integration-test</phase>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <mainClass>org.elasticsearch.test.ExternalNodeService</mainClass>
-                            <arguments>
-                                <argument>shutdown</argument>
-                            </arguments>
-                            <!-- Use the test scop to pick up log4j configuration -->
-                            <classpathScope>test</classpathScope>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.carrotsearch.randomizedtesting</groupId>
-                <artifactId>junit4-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integ-tests</id>
-                        <configuration>
-                            <!-- Paranoia around external clusters interfering with eachother -->
-                            <!-- <parallelism>1</parallelism> -->
-                            <testClassesDirectory>../shared/target/test-classes</testClassesDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>integ-setup-dependencies</id>-->
+                        <!--<phase>pre-integration-test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>unpack</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<useBaseVersion>true</useBaseVersion>-->
+                            <!--<outputDirectory>${integ.deps}/plugins</outputDirectory>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.distribution.tar</groupId>-->
+                                    <!--<artifactId>elasticsearch</artifactId>-->
+                                    <!--<version>${project.version}</version>-->
+                                    <!--<type>tar.gz</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${tests.bwc.path}</outputDirectory>-->
+                                <!--</artifactItem>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.distribution.tar</groupId>-->
+                                    <!--<artifactId>elasticsearch</artifactId>-->
+                                    <!--<version>${tests.bwc.version}</version>-->
+                                    <!--<type>tar.gz</type>-->
+                                    <!--<outputDirectory>${tests.bwc.path}</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>exec-maven-plugin</artifactId>-->
+                <!--<version>1.4.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>start-external-node-service</id>-->
+                        <!--&lt;!&ndash; Here we use exec:java with cleanupDaemonThreads=false and noblock-->
+                            <!--to _start_ ExternalNodeService and let it run until the build ends. &ndash;&gt;-->
+                        <!--<goals>-->
+                            <!--<goal>java</goal>-->
+                        <!--</goals>-->
+                        <!--<phase>pre-integration-test</phase>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<mainClass>org.elasticsearch.test.ExternalNodeService</mainClass>-->
+                            <!--<cleanupDaemonThreads>false</cleanupDaemonThreads>-->
+                            <!--<arguments>-->
+                                <!--<argument>${basedir}/${tests.bwc.path}</argument>-->
+                                <!--<argument>noblock</argument>-->
+                            <!--</arguments>-->
+                            <!--&lt;!&ndash; Use the test scop to pick up log4j configuration &ndash;&gt;-->
+                            <!--<classpathScope>test</classpathScope>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>stop-external-node-service</id>-->
+                        <!--<goals>-->
+                            <!--<goal>java</goal>-->
+                        <!--</goals>-->
+                        <!--<phase>post-integration-test</phase>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<mainClass>org.elasticsearch.test.ExternalNodeService</mainClass>-->
+                            <!--<arguments>-->
+                                <!--<argument>shutdown</argument>-->
+                            <!--</arguments>-->
+                            <!--&lt;!&ndash; Use the test scop to pick up log4j configuration &ndash;&gt;-->
+                            <!--<classpathScope>test</classpathScope>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+            <!--<plugin>-->
+                <!--<groupId>com.carrotsearch.randomizedtesting</groupId>-->
+                <!--<artifactId>junit4-maven-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>integ-tests</id>-->
+                        <!--<configuration>-->
+                            <!--&lt;!&ndash; Paranoia around external clusters interfering with eachother &ndash;&gt;-->
+                            <!--&lt;!&ndash; <parallelism>1</parallelism> &ndash;&gt;-->
+                            <!--<testClassesDirectory>../shared/target/test-classes</testClassesDirectory>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

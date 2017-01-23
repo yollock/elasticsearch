@@ -171,58 +171,58 @@
             </plugin>
 
             <!-- We copy libs for deb and rpm -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <includeScope>runtime</includeScope>
-                        </configuration>
-                    </execution>
-                    <!-- bundled modules. distributions that want them enable by setting phase: prepare-package -->
-                    <execution>
-                        <id>unpack-modules</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.module</groupId>
-                                    <artifactId>lang-expression</artifactId>
-                                    <version>${elasticsearch.version}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/modules/lang-expression</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.module</groupId>
-                                    <artifactId>lang-groovy</artifactId>
-                                    <version>${elasticsearch.version}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/modules/lang-groovy</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.elasticsearch.module</groupId>
-                                    <artifactId>reindex</artifactId>
-                                    <version>${elasticsearch.version}</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/modules/reindex</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>prepare-package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy-dependencies</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<outputDirectory>${project.build.directory}/lib</outputDirectory>-->
+                            <!--<includeScope>runtime</includeScope>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--&lt;!&ndash; bundled modules. distributions that want them enable by setting phase: prepare-package &ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>unpack-modules</id>-->
+                        <!--<phase>none</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>unpack</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.module</groupId>-->
+                                    <!--<artifactId>lang-expression</artifactId>-->
+                                    <!--<version>${elasticsearch.version}</version>-->
+                                    <!--<type>zip</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${project.build.directory}/modules/lang-expression</outputDirectory>-->
+                                <!--</artifactItem>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.module</groupId>-->
+                                    <!--<artifactId>lang-groovy</artifactId>-->
+                                    <!--<version>${elasticsearch.version}</version>-->
+                                    <!--<type>zip</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${project.build.directory}/modules/lang-groovy</outputDirectory>-->
+                                <!--</artifactItem>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.elasticsearch.module</groupId>-->
+                                    <!--<artifactId>reindex</artifactId>-->
+                                    <!--<version>${elasticsearch.version}</version>-->
+                                    <!--<type>zip</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${project.build.directory}/modules/reindex</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -281,23 +281,23 @@
                         <skipIfEmpty>true</skipIfEmpty>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>com.carrotsearch.randomizedtesting</groupId>
-                    <artifactId>junit4-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>integ-tests</id>
-                            <configuration>
-                                <!-- currently only 1 cpu works, because integ tests don't make "unique" test directories? -->
-                                <parallelism>1</parallelism>
-                                <systemProperties>
-                                    <!-- use external cluster -->
-                                    <tests.cluster>localhost:${integ.transport.port}</tests.cluster>
-                                </systemProperties>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+                <!--<plugin>-->
+                    <!--<groupId>com.carrotsearch.randomizedtesting</groupId>-->
+                    <!--<artifactId>junit4-maven-plugin</artifactId>-->
+                    <!--<executions>-->
+                        <!--<execution>-->
+                            <!--<id>integ-tests</id>-->
+                            <!--<configuration>-->
+                                <!--&lt;!&ndash; currently only 1 cpu works, because integ tests don't make "unique" test directories? &ndash;&gt;-->
+                                <!--<parallelism>1</parallelism>-->
+                                <!--<systemProperties>-->
+                                    <!--&lt;!&ndash; use external cluster &ndash;&gt;-->
+                                    <!--<tests.cluster>localhost:${integ.transport.port}</tests.cluster>-->
+                                <!--</systemProperties>-->
+                            <!--</configuration>-->
+                        <!--</execution>-->
+                    <!--</executions>-->
+                <!--</plugin>-->
             </plugins>
         </pluginManagement>
     </build>

@@ -26,16 +26,16 @@
 
         <plugins>
             <!-- bundle modules -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-modules</id>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>unpack-modules</id>-->
+                        <!--<phase>prepare-package</phase>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -55,60 +55,60 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <!-- execution and integration tests -->
-                    <!-- start up elasticsearch in foreground -->
-                    <execution>
-                        <id>execute</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target if="${run}">
-                                <!-- use conventional port numbers -->
-                                <ant antfile="${elasticsearch.integ.antfile}" target="start-foreground">
-                                    <property name="integ.http.port" value="9200"/>
-                                    <property name="integ.transport.port" value="9300"/>
-                                </ant>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <!-- start up external cluster -->
-                    <execution>
-                        <id>integ-setup</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <target>
-                                <ant antfile="${elasticsearch.integ.antfile}" target="start-external-cluster-zip">
-                                    <property name="tests.jvm.argline" value="${tests.jvm.argline}"/>
-                                </ant>
-                            </target>
-                        </configuration>
-                    </execution>
-                    <!-- shut down external cluster -->
-                    <execution>
-                        <id>integ-teardown</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skip.integ.tests}</skip>
-                            <target>
-                                <ant antfile="${elasticsearch.integ.antfile}" target="stop-external-cluster"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-antrun-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--&lt;!&ndash; execution and integration tests &ndash;&gt;-->
+                    <!--&lt;!&ndash; start up elasticsearch in foreground &ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>execute</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>run</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<target if="${run}">-->
+                                <!--&lt;!&ndash; use conventional port numbers &ndash;&gt;-->
+                                <!--<ant antfile="${elasticsearch.integ.antfile}" target="start-foreground">-->
+                                    <!--<property name="integ.http.port" value="9200"/>-->
+                                    <!--<property name="integ.transport.port" value="9300"/>-->
+                                <!--</ant>-->
+                            <!--</target>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--&lt;!&ndash; start up external cluster &ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>integ-setup</id>-->
+                        <!--<phase>pre-integration-test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>run</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<target>-->
+                                <!--<ant antfile="${elasticsearch.integ.antfile}" target="start-external-cluster-zip">-->
+                                    <!--<property name="tests.jvm.argline" value="${tests.jvm.argline}"/>-->
+                                <!--</ant>-->
+                            <!--</target>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--&lt;!&ndash; shut down external cluster &ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>integ-teardown</id>-->
+                        <!--<phase>post-integration-test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>run</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<skip>${skip.integ.tests}</skip>-->
+                            <!--<target>-->
+                                <!--<ant antfile="${elasticsearch.integ.antfile}" target="stop-external-cluster"/>-->
+                            <!--</target>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

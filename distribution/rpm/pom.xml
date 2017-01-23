@@ -31,7 +31,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.4</version>
-                <configuration><skipSource>true</skipSource></configuration>
+                <configuration>
+                    <skipSource>true</skipSource>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -120,7 +122,12 @@
                     <defaultUsername>root</defaultUsername>
                     <defaultGroupname>root</defaultGroupname>
                     <icon>${project.basedir}/src/main/resources/logo/elastic.gif</icon>
-                    <description>Elasticsearch is a distributed RESTful search engine built for the cloud. Reference documentation can be found at https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html and the 'Elasticsearch: The Definitive Guide' book can be found at https://www.elastic.co/guide/en/elasticsearch/guide/current/index.html</description>
+                    <description>Elasticsearch is a distributed RESTful search engine built for the cloud. Reference
+                        documentation can be found at
+                        https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html and the
+                        'Elasticsearch: The Definitive Guide' book can be found at
+                        https://www.elastic.co/guide/en/elasticsearch/guide/current/index.html
+                    </description>
                     <mappings>
                         <!-- Add bin directory -->
                         <mapping>
@@ -243,7 +250,8 @@
                             <configuration>true</configuration>
                             <sources>
                                 <source>
-                                    <location>${project.build.directory}/generated-packaging/rpm/systemd/sysctl</location>
+                                    <location>${project.build.directory}/generated-packaging/rpm/systemd/sysctl
+                                    </location>
                                     <includes>
                                         <include>elasticsearch.conf</include>
                                     </includes>
@@ -322,36 +330,36 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <!-- bundle modules -->
-                    <execution>
-                        <id>unpack-modules</id>
-                        <phase>prepare-package</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-rpm</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>${project.packaging}</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${rpm.outputDirectory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--&lt;!&ndash; bundle modules &ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>unpack-modules</id>-->
+                        <!--<phase>prepare-package</phase>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>copy-rpm</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>copy</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>${project.groupId}</groupId>-->
+                                    <!--<artifactId>${project.artifactId}</artifactId>-->
+                                    <!--<version>${project.version}</version>-->
+                                    <!--<type>${project.packaging}</type>-->
+                                    <!--<overWrite>true</overWrite>-->
+                                    <!--<outputDirectory>${rpm.outputDirectory}</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
