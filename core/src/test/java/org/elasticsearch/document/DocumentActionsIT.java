@@ -19,7 +19,6 @@
 
 package org.elasticsearch.document;
 
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.indices.cache.clear.ClearIndicesCacheResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushResponse;
 import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeResponse;
@@ -30,6 +29,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.test.ESIntegTestCase;
@@ -37,7 +37,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.elasticsearch.client.Requests.*;
+import static org.elasticsearch.client.Requests.clearIndicesCacheRequest;
+import static org.elasticsearch.client.Requests.countRequest;
+import static org.elasticsearch.client.Requests.getRequest;
+import static org.elasticsearch.client.Requests.indexRequest;
+import static org.elasticsearch.client.Requests.refreshRequest;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 import static org.elasticsearch.test.hamcrest.ElasticsearchAssertions.assertNoFailures;
 import static org.hamcrest.Matchers.equalTo;
@@ -52,7 +56,6 @@ public class DocumentActionsIT extends ESIntegTestCase {
         createIndex(getConcreteIndexName());
     }
 
-
     protected String getConcreteIndexName() {
         return "test";
     }
@@ -64,6 +67,8 @@ public class DocumentActionsIT extends ESIntegTestCase {
         logger.info("Running Cluster Health");
         ensureGreen();
         logger.info("Indexing [type1/1]");
+
+        // 插入并索引数据
         IndexResponse indexResponse = client().prepareIndex().setIndex("test").setType("type1").setId("1").setSource(source("1", "test")).setRefresh(true).execute().actionGet();
         assertThat(indexResponse.getIndex(), equalTo(getConcreteIndexName()));
         assertThat(indexResponse.getId(), equalTo("1"));
@@ -89,9 +94,11 @@ public class DocumentActionsIT extends ESIntegTestCase {
 
         GetResponse getResult;
 
+        // 查询
         logger.info("Get [type1/1]");
         for (int i = 0; i < 5; i++) {
             getResult = client().prepareGet("test", "type1", "1").setOperationThreaded(false).execute().actionGet();
+            System.out.println("★ getResult == " + getResult.getIndex());
             assertThat(getResult.getIndex(), equalTo(getConcreteIndexName()));
             assertThat("cycle #" + i, getResult.getSourceAsString(), equalTo(source("1", "test").string()));
             assertThat("cycle(map) #" + i, (String) getResult.getSourceAsMap().get("name"), equalTo("test"));
@@ -115,6 +122,7 @@ public class DocumentActionsIT extends ESIntegTestCase {
             assertThat(getResult.isExists(), equalTo(false));
         }
 
+        // 删除
         logger.info("Delete [type1/1]");
         DeleteResponse deleteResponse = client().prepareDelete("test", "type1", "1").execute().actionGet();
         assertThat(deleteResponse.getIndex(), equalTo(getConcreteIndexName()));
@@ -134,6 +142,7 @@ public class DocumentActionsIT extends ESIntegTestCase {
         logger.info("Index [type1/2]");
         client().index(indexRequest("test").type("type1").id("2").source(source("2", "test2"))).actionGet();
 
+        // 刷盘
         logger.info("Flushing");
         FlushResponse flushResult = client().admin().indices().prepareFlush("test").execute().actionGet();
         assertThat(flushResult.getSuccessfulShards(), equalTo(numShards.totalNumShards));
@@ -166,7 +175,7 @@ public class DocumentActionsIT extends ESIntegTestCase {
             // test failed (simply query that can't be parsed)
             try {
                 client().count(countRequest("test").source("{ term : { _type : \"type1 } }")).actionGet();
-            } catch(SearchPhaseExecutionException e) {
+            } catch (SearchPhaseExecutionException e) {
                 assertThat(e.shardFailures().length, equalTo(numShards.numPrimaries));
             }
 
@@ -186,13 +195,13 @@ public class DocumentActionsIT extends ESIntegTestCase {
         logger.info("-> running Cluster Health");
         ensureGreen();
 
-        BulkResponse bulkResponse = client().prepareBulk()
-                .add(client().prepareIndex().setIndex("test").setType("type1").setId("1").setSource(source("1", "test")))
-                .add(client().prepareIndex().setIndex("test").setType("type1").setId("2").setSource(source("2", "test")).setCreate(true))
-                .add(client().prepareIndex().setIndex("test").setType("type1").setSource(source("3", "test")))
-                .add(client().prepareDelete().setIndex("test").setType("type1").setId("1"))
-                .add(client().prepareIndex().setIndex("test").setType("type1").setSource("{ xxx }")) // failure
-                .execute().actionGet();
+        BulkResponse bulkResponse = client().prepareBulk()//
+            .add(client().prepareIndex().setIndex("test").setType("type1").setId("1").setSource(source("1", "test")))//
+            .add(client().prepareIndex().setIndex("test").setType("type1").setId("2").setSource(source("2", "test")).setCreate(true))//
+            .add(client().prepareIndex().setIndex("test").setType("type1").setSource(source("3", "test")))//
+            .add(client().prepareDelete().setIndex("test").setType("type1").setId("1"))//
+            .add(client().prepareIndex().setIndex("test").setType("type1").setSource("{ xxx }")) // failure
+            .execute().actionGet();
 
         assertThat(bulkResponse.hasFailures(), equalTo(true));
         assertThat(bulkResponse.getItems().length, equalTo(5));
