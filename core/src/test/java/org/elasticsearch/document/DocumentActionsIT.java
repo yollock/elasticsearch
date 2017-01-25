@@ -77,6 +77,11 @@ public class DocumentActionsIT extends ESIntegTestCase {
         RefreshResponse refreshResponse = refresh();
         assertThat(refreshResponse.getSuccessfulShards(), equalTo(numShards.totalNumShards));
 
+
+//        Thread.sleep(Integer.MAX_VALUE);
+
+
+
         logger.info("--> index exists?");
         assertThat(indexExists(getConcreteIndexName()), equalTo(true));
         logger.info("--> index exists?, fake index");
