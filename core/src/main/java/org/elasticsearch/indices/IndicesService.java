@@ -182,7 +182,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
         }
         try {
             if (latch.await(shardsClosedTimeout.seconds(), TimeUnit.SECONDS) == false) {
-              logger.warn("Not all shards are closed yet, waited {}sec - stopping service", shardsClosedTimeout.seconds());
+                logger.warn("Not all shards are closed yet, waited {}sec - stopping service", shardsClosedTimeout.seconds());
             }
         } catch (InterruptedException e) {
             // ignore
@@ -193,8 +193,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
 
     @Override
     protected void doClose() {
-        IOUtils.closeWhileHandlingException(injector.getInstance(RecoverySettings.class),
-            indicesAnalysisService);
+        IOUtils.closeWhileHandlingException(injector.getInstance(RecoverySettings.class), indicesAnalysisService);
     }
 
     public IndicesLifecycle indicesLifecycle() {
@@ -250,7 +249,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
                     if (indexShard.routingEntry() == null) {
                         continue;
                     }
-                    IndexShardStats indexShardStats = new IndexShardStats(indexShard.shardId(), new ShardStats[] { new ShardStats(indexShard.routingEntry(), indexShard.shardPath(), new CommonStats(indexShard, flags), indexShard.commitStats()) });
+                    IndexShardStats indexShardStats = new IndexShardStats(indexShard.shardId(), new ShardStats[]{new ShardStats(indexShard.routingEntry(), indexShard.shardPath(), new CommonStats(indexShard, flags), indexShard.commitStats())});
                     if (!statsByShard.containsKey(indexService.index())) {
                         statsByShard.put(indexService.index(), arrayAsArrayList(indexShardStats));
                     } else {
@@ -289,7 +288,6 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
 
     /**
      * Returns an IndexService for the specified index if exists otherwise returns <code>null</code>.
-     *
      */
     @Nullable
     public IndexService indexService(String index) {
@@ -323,16 +321,9 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
 
         indicesLifecycle.beforeIndexCreated(index, settings);
 
-        logger.debug("creating Index [{}], shards [{}]/[{}{}]",
-                sIndexName,
-                settings.get(SETTING_NUMBER_OF_SHARDS),
-                settings.get(SETTING_NUMBER_OF_REPLICAS),
-                IndexMetaData.isIndexUsingShadowReplicas(settings) ? "s" : "");
+        logger.debug("creating Index [{}], shards [{}]/[{}{}]", sIndexName, settings.get(SETTING_NUMBER_OF_SHARDS), settings.get(SETTING_NUMBER_OF_REPLICAS), IndexMetaData.isIndexUsingShadowReplicas(settings) ? "s" : "");
 
-        Settings indexSettings = settingsBuilder()
-                .put(this.settings)
-                .put(settings)
-                .build();
+        Settings indexSettings = settingsBuilder().put(this.settings).put(settings).build();
 
         ModulesBuilder modules = new ModulesBuilder();
         modules.add(new IndexNameModule(index));
@@ -374,8 +365,9 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
     /**
      * Removes the given index from this service and releases all associated resources. Persistent parts of the index
      * like the shards files, state and transaction logs are kept around in the case of a disaster recovery.
-     * @param index the index to remove
-     * @param reason  the high level reason causing this removal
+     *
+     * @param index  the index to remove
+     * @param reason the high level reason causing this removal
      */
     public void removeIndex(String index, String reason) {
         removeIndex(index, reason, false);
@@ -451,8 +443,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
         final RecoveryStats recoveryStats = new RecoveryStats();
 
         @Override
-        public synchronized void beforeIndexShardClosed(ShardId shardId, @Nullable IndexShard indexShard,
-                                                        Settings indexSettings) {
+        public synchronized void beforeIndexShardClosed(ShardId shardId, @Nullable IndexShard indexShard, Settings indexSettings) {
             if (indexShard != null) {
                 getStats.addTotals(indexShard.getStats());
                 indexingStats.addTotals(indexShard.indexingStats());
@@ -468,10 +459,11 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
     /**
      * Deletes the given index. Persistent parts of the index
      * like the shards files, state and transaction logs are removed once all resources are released.
-     *
+     * <p>
      * Equivalent to {@link #removeIndex(String, String)} but fires
      * different lifecycle events to ensure pending resources of this index are immediately removed.
-     * @param index the index to delete
+     *
+     * @param index  the index to delete
      * @param reason the high level reason causing this delete
      */
     public void deleteIndex(String index, String reason) throws IOException {
@@ -545,8 +537,9 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
 
     /**
      * Deletes the shard with an already acquired shard lock.
-     * @param reason the reason for the shard deletion
-     * @param lock the lock of the shard to delete
+     *
+     * @param reason        the reason for the shard deletion
+     * @param lock          the lock of the shard to delete
      * @param indexSettings the shards index settings.
      * @throws IOException if an IOException occurs
      */
@@ -560,11 +553,11 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
      * This method deletes the shard contents on disk for the given shard ID. This method will fail if the shard deleting
      * is prevented by {@link #canDeleteShardContent(org.elasticsearch.index.shard.ShardId, org.elasticsearch.cluster.metadata.IndexMetaData)}
      * of if the shards lock can not be acquired.
-     *
+     * <p>
      * On data nodes, if the deleted shard is the last shard folder in its index, the method will attempt to remove the index folder as well.
      *
-     * @param reason the reason for the shard deletion
-     * @param shardId the shards ID to delete
+     * @param reason       the reason for the shard deletion
+     * @param shardId      the shards ID to delete
      * @param clusterState . This is required to access the indexes settings etc.
      * @throws IOException if an IOException occurs
      */
@@ -579,7 +572,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
         logger.debug("{} deleted shard reason [{}]", shardId, reason);
 
         if (clusterState.nodes().localNode().isMasterNode() == false && // master nodes keep the index meta data, even if having no shards..
-                canDeleteIndexContents(shardId.index(), indexSettings, false)) {
+            canDeleteIndexContents(shardId.index(), indexSettings, false)) {
             if (nodeEnv.findAllShardIds(shardId.index()).isEmpty()) {
                 try {
                     // note that deleteIndexStore have more safety checks and may throw an exception if index was concurrently created.
@@ -598,7 +591,8 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
      * This method returns true if the current node is allowed to delete the
      * given index. If the index uses a shared filesystem this method always
      * returns false.
-     * @param index {@code Index} to check whether deletion is allowed
+     *
+     * @param index         {@code Index} to check whether deletion is allowed
      * @param indexSettings {@code Settings} for the given index
      * @return true if the index can be deleted on this node
      */
@@ -620,12 +614,12 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
      * Returns <code>true</code> iff the shards content for the given shard can be deleted.
      * This method will return <code>false</code> if:
      * <ul>
-     *     <li>if the shard is still allocated / active on this node</li>
-     *     <li>if for instance if the shard is located on shared and should not be deleted</li>
-     *     <li>if the shards data locations do not exists</li>
+     * <li>if the shard is still allocated / active on this node</li>
+     * <li>if for instance if the shard is located on shared and should not be deleted</li>
+     * <li>if the shards data locations do not exists</li>
      * </ul>
      *
-     * @param shardId the shard to delete.
+     * @param shardId  the shard to delete.
      * @param metaData the shards index metadata. This is required to access the indexes settings etc.
      */
     public boolean canDeleteShardContent(ShardId shardId, IndexMetaData metaData) {
@@ -640,9 +634,8 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
     private boolean canDeleteShardContent(ShardId shardId, Settings indexSettings) {
         final IndexServiceInjectorPair indexServiceInjectorPair = this.indices.get(shardId.getIndex());
         if (IndexMetaData.isOnSharedFilesystem(indexSettings) == false) {
-             if (nodeEnv.hasNodeFile()) {
-                boolean isAllocated = indexServiceInjectorPair != null && indexServiceInjectorPair
-                    .getIndexService().hasShard(shardId.getId());
+            if (nodeEnv.hasNodeFile()) {
+                boolean isAllocated = indexServiceInjectorPair != null && indexServiceInjectorPair.getIndexService().hasShard(shardId.getId());
                 if (isAllocated) {
                     return false; // we are allocated - can't delete the shard
                 }
@@ -753,7 +746,8 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
      * they are used by a different process ie. on Windows where files might still be open by a virus scanner. On a shared
      * filesystem a replica might not have been closed when the primary is deleted causing problems on delete calls so we
      * schedule there deletes later.
-     * @param index the index to process the pending deletes for
+     *
+     * @param index   the index to process the pending deletes for
      * @param timeout the timeout used for processing pending deletes
      */
     public void processPendingDeletes(Index index, Settings indexSettings, TimeValue timeout) throws IOException, InterruptedException {
@@ -767,7 +761,7 @@ public class IndicesService extends AbstractLifecycleComponent<IndicesService> i
             }
             final List<PendingDelete> remove;
             synchronized (pendingDeletes) {
-                 remove = pendingDeletes.remove(index);
+                remove = pendingDeletes.remove(index);
             }
             if (remove != null && remove.isEmpty() == false) {
                 CollectionUtil.timSort(remove); // make sure we delete indices first

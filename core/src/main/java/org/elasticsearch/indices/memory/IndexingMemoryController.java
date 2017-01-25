@@ -43,46 +43,74 @@ import java.util.List;
 
 public class IndexingMemoryController extends AbstractLifecycleComponent<IndexingMemoryController> {
 
-    /** How much heap (% or bytes) we will share across all actively indexing shards on this node (default: 10%). */
+    /**
+     * How much heap (% or bytes) we will share across all actively indexing shards on this node (default: 10%).
+     */
     public static final String INDEX_BUFFER_SIZE_SETTING = "indices.memory.index_buffer_size";
 
-    /** Only applies when <code>indices.memory.index_buffer_size</code> is a %, to set a floor on the actual size in bytes (default: 48 MB). */
+    /**
+     * Only applies when <code>indices.memory.index_buffer_size</code> is a %, to set a floor on the actual size in bytes (default: 48 MB).
+     */
     public static final String MIN_INDEX_BUFFER_SIZE_SETTING = "indices.memory.min_index_buffer_size";
 
-    /** Only applies when <code>indices.memory.index_buffer_size</code> is a %, to set a ceiling on the actual size in bytes (default: not set). */
+    /**
+     * Only applies when <code>indices.memory.index_buffer_size</code> is a %, to set a ceiling on the actual size in bytes (default: not set).
+     */
     public static final String MAX_INDEX_BUFFER_SIZE_SETTING = "indices.memory.max_index_buffer_size";
 
-    /** Sets a floor on the per-shard index buffer size (default: 4 MB). */
+    /**
+     * Sets a floor on the per-shard index buffer size (default: 4 MB).
+     */
     public static final String MIN_SHARD_INDEX_BUFFER_SIZE_SETTING = "indices.memory.min_shard_index_buffer_size";
 
-    /** Sets a ceiling on the per-shard index buffer size (default: 512 MB). */
+    /**
+     * Sets a ceiling on the per-shard index buffer size (default: 512 MB).
+     */
     public static final String MAX_SHARD_INDEX_BUFFER_SIZE_SETTING = "indices.memory.max_shard_index_buffer_size";
 
-    /** How much heap (% or bytes) we will share across all actively indexing shards for the translog buffer (default: 1%). */
+    /**
+     * How much heap (% or bytes) we will share across all actively indexing shards for the translog buffer (default: 1%).
+     */
     public static final String TRANSLOG_BUFFER_SIZE_SETTING = "indices.memory.translog_buffer_size";
 
-    /** Only applies when <code>indices.memory.translog_buffer_size</code> is a %, to set a floor on the actual size in bytes (default: 256 KB). */
+    /**
+     * Only applies when <code>indices.memory.translog_buffer_size</code> is a %, to set a floor on the actual size in bytes (default: 256 KB).
+     */
     public static final String MIN_TRANSLOG_BUFFER_SIZE_SETTING = "indices.memory.min_translog_buffer_size";
 
-    /** Only applies when <code>indices.memory.translog_buffer_size</code> is a %, to set a ceiling on the actual size in bytes (default: not set). */
+    /**
+     * Only applies when <code>indices.memory.translog_buffer_size</code> is a %, to set a ceiling on the actual size in bytes (default: not set).
+     */
     public static final String MAX_TRANSLOG_BUFFER_SIZE_SETTING = "indices.memory.max_translog_buffer_size";
 
-    /** Sets a floor on the per-shard translog buffer size (default: 2 KB). */
+    /**
+     * Sets a floor on the per-shard translog buffer size (default: 2 KB).
+     */
     public static final String MIN_SHARD_TRANSLOG_BUFFER_SIZE_SETTING = "indices.memory.min_shard_translog_buffer_size";
 
-    /** Sets a ceiling on the per-shard translog buffer size (default: 64 KB). */
+    /**
+     * Sets a ceiling on the per-shard translog buffer size (default: 64 KB).
+     */
     public static final String MAX_SHARD_TRANSLOG_BUFFER_SIZE_SETTING = "indices.memory.max_shard_translog_buffer_size";
 
-    /** If we see no indexing operations after this much time for a given shard, we consider that shard inactive (default: 5 minutes). */
+    /**
+     * If we see no indexing operations after this much time for a given shard, we consider that shard inactive (default: 5 minutes).
+     */
     public static final String SHARD_INACTIVE_TIME_SETTING = "indices.memory.shard_inactive_time";
 
-    /** How frequently we check shards to find inactive ones (default: 30 seconds). */
+    /**
+     * How frequently we check shards to find inactive ones (default: 30 seconds).
+     */
     public static final String SHARD_INACTIVE_INTERVAL_TIME_SETTING = "indices.memory.interval";
 
-    /** Once a shard becomes inactive, we reduce the {@code IndexWriter} buffer to this value (500 KB) to let active shards use the heap instead. */
+    /**
+     * Once a shard becomes inactive, we reduce the {@code IndexWriter} buffer to this value (500 KB) to let active shards use the heap instead.
+     */
     public static final ByteSizeValue INACTIVE_SHARD_INDEXING_BUFFER = ByteSizeValue.parseBytesSizeValue("500kb", "INACTIVE_SHARD_INDEXING_BUFFER");
 
-    /** Once a shard becomes inactive, we reduce the {@code Translog} buffer to this value (1 KB) to let active shards use the heap instead. */
+    /**
+     * Once a shard becomes inactive, we reduce the {@code Translog} buffer to this value (1 KB) to let active shards use the heap instead.
+     */
     public static final ByteSizeValue INACTIVE_SHARD_TRANSLOG_BUFFER = ByteSizeValue.parseBytesSizeValue("1kb", "INACTIVE_SHARD_TRANSLOG_BUFFER");
 
     private final ThreadPool threadPool;
@@ -101,8 +129,7 @@ public class IndexingMemoryController extends AbstractLifecycleComponent<Indexin
 
     private volatile Cancellable scheduler;
 
-    private static final EnumSet<IndexShardState> CAN_UPDATE_INDEX_BUFFER_STATES = EnumSet.of(
-            IndexShardState.RECOVERING, IndexShardState.POST_RECOVERY, IndexShardState.STARTED, IndexShardState.RELOCATED);
+    private static final EnumSet<IndexShardState> CAN_UPDATE_INDEX_BUFFER_STATES = EnumSet.of(IndexShardState.RECOVERING, IndexShardState.POST_RECOVERY, IndexShardState.STARTED, IndexShardState.RELOCATED);
 
     private final ShardsIndicesStatusChecker statusChecker;
 
@@ -166,12 +193,7 @@ public class IndexingMemoryController extends AbstractLifecycleComponent<Indexin
 
         this.statusChecker = new ShardsIndicesStatusChecker();
 
-        logger.debug("using indexing buffer size [{}], with {} [{}], {} [{}], {} [{}], {} [{}]",
-                this.indexingBuffer,
-                MIN_SHARD_INDEX_BUFFER_SIZE_SETTING, this.minShardIndexBufferSize,
-                MAX_SHARD_INDEX_BUFFER_SIZE_SETTING, this.maxShardIndexBufferSize,
-                SHARD_INACTIVE_TIME_SETTING, this.inactiveTime,
-                SHARD_INACTIVE_INTERVAL_TIME_SETTING, this.interval);
+        logger.debug("using indexing buffer size [{}], with {} [{}], {} [{}], {} [{}], {} [{}]", this.indexingBuffer, MIN_SHARD_INDEX_BUFFER_SIZE_SETTING, this.minShardIndexBufferSize, MAX_SHARD_INDEX_BUFFER_SIZE_SETTING, this.maxShardIndexBufferSize, SHARD_INACTIVE_TIME_SETTING, this.inactiveTime, SHARD_INACTIVE_INTERVAL_TIME_SETTING, this.interval);
     }
 
     @Override
@@ -219,13 +241,17 @@ public class IndexingMemoryController extends AbstractLifecycleComponent<Indexin
         return availableShards;
     }
 
-    /** returns true if shard exists and is availabe for updates */
+    /**
+     * returns true if shard exists and is availabe for updates
+     */
     protected boolean shardAvailable(@Nullable IndexShard shard) {
         // shadow replica doesn't have an indexing buffer
         return shard != null && shard.canIndex() && CAN_UPDATE_INDEX_BUFFER_STATES.contains(shard.state());
     }
 
-    /** set new indexing and translog buffers on this shard.  this may cause the shard to refresh to free up heap. */
+    /**
+     * set new indexing and translog buffers on this shard.  this may cause the shard to refresh to free up heap.
+     */
     protected void updateShardBuffers(IndexShard shard, ByteSizeValue shardIndexingBufferSize, ByteSizeValue shardTranslogBufferSize) {
         if (shard != null) {
             try {
@@ -240,7 +266,9 @@ public class IndexingMemoryController extends AbstractLifecycleComponent<Indexin
         }
     }
 
-    /** check if any shards active status changed, now. */
+    /**
+     * check if any shards active status changed, now.
+     */
     public void forceCheck() {
         statusChecker.run();
     }
@@ -260,6 +288,7 @@ public class IndexingMemoryController extends AbstractLifecycleComponent<Indexin
             // TODO: we could be smarter here by taking into account how RAM the IndexWriter on each shard
             // is actually using (using IW.ramBytesUsed), so that small indices (e.g. Marvel) would not
             // get the same indexing buffer as large indices.  But it quickly gets tricky...
+            // 使得小索引（例如Marvel）不会获得与大索引相同的索引缓冲区。 它很快就变得棘手
             if (activeShardCount == 0) {
                 return;
             }

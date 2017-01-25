@@ -41,22 +41,24 @@ import java.util.List;
  * on the underlying Lucene index. An {@code IndexReader} is opened instead of
  * an {@code IndexWriter}. All methods that would usually perform write
  * operations are no-ops, this means:
- *
+ * <p>
  * - No operations are written to or read from the translog
  * - Create, Index, and Delete do nothing
  * - Flush does not fsync any files, or make any on-disk changes
- *
+ * <p>
  * In order for new segments to become visible, the ShadowEngine may perform
  * stage1 of the traditional recovery process (copying segment files) from a
  * regular primary (which uses {@link org.elasticsearch.index.engine.InternalEngine})
- *
+ * <p>
  * Notice that since this Engine does not deal with the translog, any
  * {@link #get(Get get)} request goes directly to the searcher, meaning it is
  * non-realtime.
  */
 public class ShadowEngine extends Engine {
 
-    /** how long to wait for an index to exist */
+    /**
+     * how long to wait for an index to exist
+     */
     public final static String NONEXISTENT_INDEX_RETRY_WAIT = "index.shadow.wait_for_initial_commit";
     public final static TimeValue DEFAULT_NONEXISTENT_INDEX_RETRY_WAIT = TimeValue.timeValueSeconds(5);
 
@@ -64,12 +66,10 @@ public class ShadowEngine extends Engine {
 
     private volatile SegmentInfos lastCommittedSegmentInfos;
 
-    public ShadowEngine(EngineConfig engineConfig)  {
+    public ShadowEngine(EngineConfig engineConfig) {
         super(engineConfig);
         SearcherFactory searcherFactory = new EngineSearcherFactory(engineConfig);
-        final long nonexistentRetryTime = engineConfig.getIndexSettings()
-                .getAsTime(NONEXISTENT_INDEX_RETRY_WAIT, DEFAULT_NONEXISTENT_INDEX_RETRY_WAIT)
-                .getMillis();
+        final long nonexistentRetryTime = engineConfig.getIndexSettings().getAsTime(NONEXISTENT_INDEX_RETRY_WAIT, DEFAULT_NONEXISTENT_INDEX_RETRY_WAIT).getMillis();
         try {
             DirectoryReader reader = null;
             store.incRef();
@@ -81,9 +81,7 @@ public class ShadowEngine extends Engine {
                     this.lastCommittedSegmentInfos = readLastCommittedSegmentInfos(searcherManager, store);
                     success = true;
                 } else {
-                    throw new IllegalStateException("failed to open a shadow engine after" +
-                            nonexistentRetryTime + "ms, " +
-                            "directory is not an index");
+                    throw new IllegalStateException("failed to open a shadow engine after" + nonexistentRetryTime + "ms, " + "directory is not an index");
                 }
             } catch (Throwable e) {
                 logger.warn("failed to create new reader", e);
@@ -116,7 +114,9 @@ public class ShadowEngine extends Engine {
         throw new UnsupportedOperationException(shardId + " delete operation not allowed on shadow engine");
     }
 
-    /** @deprecated This was removed, but we keep this API so translog can replay any DBQs on upgrade. */
+    /**
+     * @deprecated This was removed, but we keep this API so translog can replay any DBQs on upgrade.
+     */
     @Deprecated
     @Override
     public void delete(DeleteByQuery delete) throws EngineException {

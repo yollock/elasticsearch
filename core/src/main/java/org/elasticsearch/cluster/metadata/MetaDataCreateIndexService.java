@@ -106,10 +106,7 @@ public class MetaDataCreateIndexService extends AbstractComponent {
     private final Environment env;
 
     @Inject
-    public MetaDataCreateIndexService(Settings settings, ClusterService clusterService,
-                                      IndicesService indicesService, AllocationService allocationService,
-                                      Version version, AliasValidator aliasValidator,
-                                      Set<IndexTemplateFilter> indexTemplateFilters, Environment env) {
+    public MetaDataCreateIndexService(Settings settings, ClusterService clusterService, IndicesService indicesService, AllocationService allocationService, Version version, AliasValidator aliasValidator, Set<IndexTemplateFilter> indexTemplateFilters, Environment env) {
         super(settings);
         this.clusterService = clusterService;
         this.indicesService = indicesService;
@@ -158,9 +155,7 @@ public class MetaDataCreateIndexService extends AbstractComponent {
             throw new ElasticsearchException("Unable to determine length of index name", e);
         }
         if (byteCount > MAX_INDEX_NAME_BYTES) {
-            throw new InvalidIndexNameException(new Index(index), index,
-                    "index name is too long, (" + byteCount +
-                    " > " + MAX_INDEX_NAME_BYTES + ")");
+            throw new InvalidIndexNameException(new Index(index), index, "index name is too long, (" + byteCount + " > " + MAX_INDEX_NAME_BYTES + ")");
         }
         if (state.metaData().hasAlias(index)) {
             throw new InvalidIndexNameException(new Index(index), index, "already exists as alias");
@@ -175,12 +170,11 @@ public class MetaDataCreateIndexService extends AbstractComponent {
         updatedSettingsBuilder.put(request.settings()).normalizePrefix(IndexMetaData.INDEX_SETTING_PREFIX);
         request.settings(updatedSettingsBuilder.build());
 
-        clusterService.submitStateUpdateTask("create-index [" + request.index() + "], cause [" + request.cause() + "]",
-                new AckedClusterStateUpdateTask<ClusterStateUpdateResponse>(Priority.URGENT, request, listener) {
-                    @Override
-                    protected ClusterStateUpdateResponse newResponse(boolean acknowledged) {
-                        return new ClusterStateUpdateResponse(acknowledged);
-                    }
+        clusterService.submitStateUpdateTask("create-index [" + request.index() + "], cause [" + request.cause() + "]", new AckedClusterStateUpdateTask<ClusterStateUpdateResponse>(Priority.URGENT, request, listener) {
+            @Override
+            protected ClusterStateUpdateResponse newResponse(boolean acknowledged) {
+                return new ClusterStateUpdateResponse(acknowledged);
+            }
 
             @Override
             public ClusterState execute(ClusterState currentState) throws Exception {
@@ -348,8 +342,7 @@ public class MetaDataCreateIndexService extends AbstractComponent {
                         indexMetaDataBuilder.putAlias(aliasMetaData);
                     }
                     for (Alias alias : request.aliases()) {
-                        AliasMetaData aliasMetaData = AliasMetaData.builder(alias.name()).filter(alias.filter())
-                                .indexRouting(alias.indexRouting()).searchRouting(alias.searchRouting()).build();
+                        AliasMetaData aliasMetaData = AliasMetaData.builder(alias.name()).filter(alias.filter()).indexRouting(alias.indexRouting()).searchRouting(alias.searchRouting()).build();
                         indexMetaDataBuilder.putAlias(aliasMetaData);
                     }
 
@@ -367,17 +360,19 @@ public class MetaDataCreateIndexService extends AbstractComponent {
                         throw e;
                     }
 
-                    indexService.indicesLifecycle().beforeIndexAddedToCluster(new Index(request.index()),
-                            indexMetaData.getSettings());
+                    indexService.indicesLifecycle().beforeIndexAddedToCluster(new Index(request.index()), indexMetaData.getSettings());
 
-                    MetaData newMetaData = MetaData.builder(currentState.metaData())
-                            .put(indexMetaData, false)
-                            .build();
+                    MetaData newMetaData = MetaData.builder(currentState.metaData()).put(indexMetaData, false).build();
 
                     String maybeShadowIndicator = IndexMetaData.isIndexUsingShadowReplicas(indexMetaData.getSettings()) ? "s" : "";
-                    logger.info("[{}] creating index, cause [{}], templates {}, shards [{}]/[{}{}], mappings {}",
-                            request.index(), request.cause(), templateNames, indexMetaData.getNumberOfShards(),
-                            indexMetaData.getNumberOfReplicas(), maybeShadowIndicator, mappings.keySet());
+                    logger.info("[{}] creating index, cause [{}], templates {}, shards [{}]/[{}{}], mappings {}", //
+                        request.index(), //
+                        request.cause(), //
+                        templateNames, //
+                        indexMetaData.getNumberOfShards(), //
+                        indexMetaData.getNumberOfReplicas(), //
+                        maybeShadowIndicator, mappings.keySet() //
+                    );
 
                     ClusterBlocks.Builder blocks = ClusterBlocks.builder().blocks(currentState.blocks());
                     if (!request.blocks().isEmpty()) {
@@ -390,11 +385,11 @@ public class MetaDataCreateIndexService extends AbstractComponent {
                     ClusterState updatedState = ClusterState.builder(currentState).blocks(blocks).metaData(newMetaData).build();
 
                     if (request.state() == State.OPEN) {
-                        RoutingTable.Builder routingTableBuilder = RoutingTable.builder(updatedState.routingTable())
-                                .addAsNew(updatedState.metaData().index(request.index()));
-                        RoutingAllocation.Result routingResult = allocationService.reroute(
-                                ClusterState.builder(updatedState).routingTable(routingTableBuilder.build()).build(),
-                                "index [" + request.index() + "] created");
+                        RoutingTable.Builder routingTableBuilder = RoutingTable.builder(updatedState.routingTable()).addAsNew(updatedState.metaData().index(request.index()));
+                        RoutingAllocation.Result routingResult = allocationService.reroute( //
+                            ClusterState.builder(updatedState).routingTable(routingTableBuilder.build()).build(), //
+                            "index [" + request.index() + "] created"//
+                        );
                         updatedState = ClusterState.builder(updatedState).routingResult(routingResult).build();
                     }
                     removalReason = "cleaning up after validating index on master";

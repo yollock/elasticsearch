@@ -316,7 +316,7 @@ public class IndicesTTLService extends AbstractLifecycleComponent<IndicesTTLServ
             final TimeValue currentInterval = IndicesTTLService.this.purgerThread.getInterval();
             final TimeValue interval = settings.getAsTime(INDICES_TTL_INTERVAL, currentInterval);
             if (!interval.equals(currentInterval)) {
-                logger.info("updating indices.ttl.interval from [{}] to [{}]",currentInterval, interval);
+                logger.info("updating indices.ttl.interval from [{}] to [{}]", currentInterval, interval);
                 IndicesTTLService.this.purgerThread.resetInterval(interval);
 
             }

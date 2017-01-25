@@ -150,8 +150,7 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
         for (IndexShardRoutingTable indexShardRoutingTable : this) {
             int routingNumberOfReplicas = indexShardRoutingTable.size() - 1;
             if (routingNumberOfReplicas != indexMetaData.getNumberOfReplicas()) {
-                failures.add("Shard [" + indexShardRoutingTable.shardId().id()
-                        + "] routing table has wrong number of replicas, expected [" + indexMetaData.getNumberOfReplicas() + "], got [" + routingNumberOfReplicas + "]");
+                failures.add("Shard [" + indexShardRoutingTable.shardId().id() + "] routing table has wrong number of replicas, expected [" + indexMetaData.getNumberOfReplicas() + "], got [" + routingNumberOfReplicas + "]");
             }
             for (ShardRouting shardRouting : indexShardRoutingTable) {
                 if (!shardRouting.index().equals(index())) {
@@ -462,9 +461,7 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
                 int shardId = cursor.value;
                 // version 0, will get updated when reroute will happen
                 ShardRouting shard = ShardRouting.newUnassigned(index, shardId, null, false, new UnassignedInfo(UnassignedInfo.Reason.REPLICA_ADDED, null));
-                shards.put(shardId,
-                        new IndexShardRoutingTable.Builder(shards.get(shard.id())).addShard(shard).build()
-                );
+                shards.put(shardId, new IndexShardRoutingTable.Builder(shards.get(shard.id())).addShard(shard).build());
             }
             return this;
         }
@@ -542,11 +539,9 @@ public class IndexRoutingTable extends AbstractDiffable<IndexRoutingTable> imple
         CollectionUtil.timSort(ordered, new Comparator<IndexShardRoutingTable>() {
             @Override
             public int compare(IndexShardRoutingTable o1, IndexShardRoutingTable o2) {
-                int v = o1.shardId().index().name().compareTo(
-                        o2.shardId().index().name());
+                int v = o1.shardId().index().name().compareTo(o2.shardId().index().name());
                 if (v == 0) {
-                    v = Integer.compare(o1.shardId().id(),
-                                        o2.shardId().id());
+                    v = Integer.compare(o1.shardId().id(), o2.shardId().id());
                 }
                 return v;
             }

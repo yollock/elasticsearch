@@ -126,11 +126,7 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
     private final AtomicBoolean deleted = new AtomicBoolean(false);
 
     @Inject
-    public IndexService(Injector injector, Index index, NodeEnvironment nodeEnv,
-                        AnalysisService analysisService, MapperService mapperService, IndexQueryParserService queryParserService,
-                        SimilarityService similarityService, IndexAliasesService aliasesService, IndexCache indexCache,
-                        IndexSettingsService settingsService,
-                        IndexFieldDataService indexFieldData, BitsetFilterCache bitSetFilterCache, IndicesService indicesServices) {
+    public IndexService(Injector injector, Index index, NodeEnvironment nodeEnv, AnalysisService analysisService, MapperService mapperService, IndexQueryParserService queryParserService, SimilarityService similarityService, IndexAliasesService aliasesService, IndexCache indexCache, IndexSettingsService settingsService, IndexFieldDataService indexFieldData, BitsetFilterCache bitSetFilterCache, IndicesService indicesServices) {
 
         super(index, settingsService.getSettings());
         this.injector = injector;
@@ -260,7 +256,7 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
     /**
      * Return the shard injector for the provided id, or throw an exception if there is no such shard.
      */
-    public Injector shardInjectorSafe(int shardId)  {
+    public Injector shardInjectorSafe(int shardId) {
         IndexShardInjectorPair indexShardInjectorPair = shards.get(shardId);
         if (indexShardInjectorPair == null) {
             throw new ShardNotFoundException(new ShardId(index, shardId));
@@ -276,7 +272,7 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
     private long getAvgShardSizeInBytes() throws IOException {
         long sum = 0;
         int count = 0;
-        for(IndexShard indexShard : this) {
+        for (IndexShard indexShard : this) {
             sum += indexShard.store().stats().sizeInBytes();
             count++;
         }
@@ -324,17 +320,16 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
                 // that's being relocated/replicated we know how large it will become once it's done copying:
 
                 // Count up how many shards are currently on each data path:
-                Map<Path,Integer> dataPathToShardCount = new HashMap<>();
-                for(IndexShard shard : this) {
+                Map<Path, Integer> dataPathToShardCount = new HashMap<>();
+                for (IndexShard shard : this) {
                     Path dataPath = shard.shardPath().getRootStatePath();
                     Integer curCount = dataPathToShardCount.get(dataPath);
                     if (curCount == null) {
                         curCount = 0;
                     }
-                    dataPathToShardCount.put(dataPath, curCount+1);
+                    dataPathToShardCount.put(dataPath, curCount + 1);
                 }
-                path = ShardPath.selectNewPathForShard(nodeEnv, shardId, indexSettings, routing.getExpectedShardSize() == ShardRouting.UNAVAILABLE_EXPECTED_SHARD_SIZE ? getAvgShardSizeInBytes() : routing.getExpectedShardSize(),
-                                                       dataPathToShardCount);
+                path = ShardPath.selectNewPathForShard(nodeEnv, shardId, indexSettings, routing.getExpectedShardSize() == ShardRouting.UNAVAILABLE_EXPECTED_SHARD_SIZE ? getAvgShardSizeInBytes() : routing.getExpectedShardSize(), dataPathToShardCount);
                 logger.debug("{} creating using a new path [{}]", shardId, path);
             } else {
                 logger.debug("{} creating using an existing path [{}]", shardId, path);
@@ -346,21 +341,19 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
 
             logger.debug("creating shard_id {}", shardId);
             // if we are on a shared FS we only own the shard (ie. we can safely delete it) if we are the primary.
-            final boolean canDeleteShardContent = IndexMetaData.isOnSharedFilesystem(indexSettings) == false ||
-                    (primary && IndexMetaData.isOnSharedFilesystem(indexSettings));
+            final boolean canDeleteShardContent = IndexMetaData.isOnSharedFilesystem(indexSettings) == false || (primary && IndexMetaData.isOnSharedFilesystem(indexSettings));
             ModulesBuilder modules = new ModulesBuilder();
             // plugin modules must be added here, before others or we can get crazy injection errors...
             for (Module pluginModule : pluginsService.shardModules(indexSettings)) {
                 modules.add(pluginModule);
             }
             modules.add(new IndexShardModule(shardId, primary, indexSettings));
-            modules.add(new StoreModule(injector.getInstance(IndexStore.class).shardDirectory(), lock,
-                    new StoreCloseListener(shardId, canDeleteShardContent,  new Closeable() {
-                        @Override
-                        public void close() throws IOException {
-                            injector.getInstance(IndicesQueryCache.class).onClose(shardId);
-                        }
-                    }), path));
+            modules.add(new StoreModule(injector.getInstance(IndexStore.class).shardDirectory(), lock, new StoreCloseListener(shardId, canDeleteShardContent, new Closeable() {
+                @Override
+                public void close() throws IOException {
+                    injector.getInstance(IndicesQueryCache.class).onClose(shardId);
+                }
+            }), path));
             modules.add(new DeletionPolicyModule());
 
             pluginsService.processModules(modules);
@@ -446,8 +439,7 @@ public class IndexService extends AbstractIndexComponent implements IndexCompone
                         // ignore
                     }
                 }
-                closeInjectorResource(sId, shardInjector,
-                        StoreRecoveryService.class);
+                closeInjectorResource(sId, shardInjector, StoreRecoveryService.class);
 
                 // call this before we close the store, so we can release resources for it
                 indicesLifecycle.afterIndexShardClosed(sId, indexShard, indexSettings);

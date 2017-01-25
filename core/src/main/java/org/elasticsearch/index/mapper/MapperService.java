@@ -90,8 +90,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         /**
          * Create or update a mapping.
          */
-        MAPPING_UPDATE,
-        /**
+        MAPPING_UPDATE, /**
          * Recovery of an existing mapping, for instance because of a restart,
          * if a shard was moved to a different node or for administrative
          * purposes.
@@ -103,10 +102,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
     public static final String INDEX_MAPPER_DYNAMIC_SETTING = "index.mapper.dynamic";
     public static final String INDEX_MAPPING_NESTED_FIELDS_LIMIT_SETTING = "index.mapping.nested_fields.limit";
     public static final boolean INDEX_MAPPER_DYNAMIC_DEFAULT = true;
-    private static ObjectHashSet<String> META_FIELDS = ObjectHashSet.from(
-            "_uid", "_id", "_type", "_all", "_parent", "_routing", "_index",
-            "_size", "_timestamp", "_ttl"
-    );
+    private static ObjectHashSet<String> META_FIELDS = ObjectHashSet.from("_uid", "_id", "_type", "_all", "_parent", "_routing", "_index", "_size", "_timestamp", "_ttl");
 
     private static final Function<MappedFieldType, Analyzer> INDEX_ANALYZER_EXTRACTOR = new Function<MappedFieldType, Analyzer>() {
         public Analyzer apply(MappedFieldType fieldType) {
@@ -159,9 +155,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
     final MapperRegistry mapperRegistry;
 
     @Inject
-    public MapperService(Index index, IndexSettingsService indexSettingsService, AnalysisService analysisService,
-                         SimilarityLookupService similarityLookupService,
-                         ScriptService scriptService, MapperRegistry mapperRegistry) {
+    public MapperService(Index index, IndexSettingsService indexSettingsService, AnalysisService analysisService, SimilarityLookupService similarityLookupService, ScriptService scriptService, MapperRegistry mapperRegistry) {
         super(index, indexSettingsService.getSettings());
         this.indexSettings = indexSettingsService.getSettings();
         this.indexSettingsService = indexSettingsService;
@@ -174,25 +168,9 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         this.searchQuoteAnalyzer = new MapperAnalyzerWrapper(analysisService.defaultSearchQuoteAnalyzer(), SEARCH_QUOTE_ANALYZER_EXTRACTOR);
 
         this.dynamic = this.indexSettings.getAsBoolean(INDEX_MAPPER_DYNAMIC_SETTING, INDEX_MAPPER_DYNAMIC_DEFAULT);
-        defaultPercolatorMappingSource = "{\n" +
-            "\"_default_\":{\n" +
-            "\"properties\" : {\n" +
-            "\"query\" : {\n" +
-            "\"type\" : \"object\",\n" +
-            "\"enabled\" : false\n" +
-            "}\n" +
-            "}\n" +
-            "}\n" +
-            "}";
-        if (index.getName().equals(ScriptService.SCRIPT_INDEX)){
-            defaultMappingSource =  "{" +
-                "\"_default_\": {" +
-                "\"properties\": {" +
-                "\"script\": { \"enabled\": false }," +
-                "\"template\": { \"enabled\": false }" +
-                "}" +
-                "}" +
-                "}";
+        defaultPercolatorMappingSource = "{\n" + "\"_default_\":{\n" + "\"properties\" : {\n" + "\"query\" : {\n" + "\"type\" : \"object\",\n" + "\"enabled\" : false\n" + "}\n" + "}\n" + "}\n" + "}";
+        if (index.getName().equals(ScriptService.SCRIPT_INDEX)) {
+            defaultMappingSource = "{" + "\"_default_\": {" + "\"properties\": {" + "\"script\": { \"enabled\": false }," + "\"template\": { \"enabled\": false }" + "}" + "}" + "}";
         } else {
             defaultMappingSource = "{\"_default_\":{}}";
         }
@@ -204,9 +182,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         }
     }
 
-    public MapperService(Index index, Settings indexSettings, AnalysisService analysisService,
-                         SimilarityLookupService similarityLookupService,
-                         ScriptService scriptService, MapperRegistry mapperRegistry) {
+    public MapperService(Index index, Settings indexSettings, AnalysisService analysisService, SimilarityLookupService similarityLookupService, ScriptService scriptService, MapperRegistry mapperRegistry) {
         this(index, new IndexSettingsService(index, indexSettings), analysisService, similarityLookupService, scriptService, mapperRegistry);
     }
 
@@ -227,7 +203,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
      *                                As is this not really an active type, you would typically set this to false
      */
     public Iterable<DocumentMapper> docMappers(final boolean includingDefaultMapping) {
-        return  new Iterable<DocumentMapper>() {
+        return new Iterable<DocumentMapper>() {
             @Override
             public Iterator<DocumentMapper> iterator() {
                 final Iterator<DocumentMapper> iterator;
@@ -312,8 +288,8 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         } else {
             synchronized (this) {
                 final boolean applyDefault =
-                        // the default was already applied if we are recovering
-                        reason != MergeReason.MAPPING_RECOVERY
+                    // the default was already applied if we are recovering
+                    reason != MergeReason.MAPPING_RECOVERY
                         // only apply the default mapping if we don't have the type yet
                         && mappers.containsKey(type) == false;
                 DocumentMapper mergeWith = parse(type, mappingSource, applyDefault);
@@ -330,7 +306,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             throw new InvalidTypeNameException("mapping type name [" + mapper.type() + "] is too long; limit is length 255 but was [" + mapper.type().length() + "]");
         }
         if (mapper.type().charAt(0) == '_') {
-           throw new InvalidTypeNameException("mapping type name [" + mapper.type() + "] can't start with '_'");
+            throw new InvalidTypeNameException("mapping type name [" + mapper.type() + "] can't start with '_'");
         }
         if (mapper.type().contains("#")) {
             throw new InvalidTypeNameException("mapping type name [" + mapper.type() + "] should not include '#' in it");
@@ -350,12 +326,10 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         }
         if (reason == MergeReason.MAPPING_UPDATE) {
             if (mapper.timestampFieldMapper().enabled()) {
-                deprecationLogger.deprecated("[_timestamp] will be removed in 5.0. As a replacement, you should explicitly populate a date "
-                        + "field with the current timestamp in your documents.");
+                deprecationLogger.deprecated("[_timestamp] will be removed in 5.0. As a replacement, you should explicitly populate a date " + "field with the current timestamp in your documents.");
             }
             if (mapper.TTLFieldMapper().enabled()) {
-                deprecationLogger.deprecated("[_ttl] will be removed in 5.0. As a replacement, you should use time based indexes or cron "
-                        + "a delete-by-query with a range query on a timestamp field.");
+                deprecationLogger.deprecated("[_ttl] will be removed in 5.0. As a replacement, you should use time based indexes or cron " + "a delete-by-query with a range query on a timestamp field.");
             }
         }
 
@@ -458,9 +432,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         DocumentMapper newMapper = parse(mapper.type(), mappingSource, false);
 
         if (newMapper.mappingSource().equals(mappingSource) == false) {
-            throw new IllegalStateException("DocumentMapper serialization result is different from source. \n--> Source ["
-                + mappingSource + "]\n--> Result ["
-                + newMapper.mappingSource() + "]");
+            throw new IllegalStateException("DocumentMapper serialization result is different from source. \n--> Source [" + mappingSource + "]\n--> Result [" + newMapper.mappingSource() + "]");
         }
         return true;
     }
@@ -500,15 +472,13 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         // then check other types
         for (String fieldName : fieldNames) {
             if (fullPathObjectMappers.containsKey(fieldName)) {
-                throw new IllegalArgumentException("[" + fieldName + "] is defined as a field in mapping [" + type
-                        + "] but this name is already used for an object in other types");
+                throw new IllegalArgumentException("[" + fieldName + "] is defined as a field in mapping [" + type + "] but this name is already used for an object in other types");
             }
         }
 
         for (String objectPath : objectFullNames) {
             if (fieldTypes.get(objectPath) != null) {
-                throw new IllegalArgumentException("[" + objectPath + "] is defined as an object in mapping [" + type
-                        + "] but this name is already used for a field in other types");
+                throw new IllegalArgumentException("[" + objectPath + "] is defined as an object in mapping [" + type + "] but this name is already used for a field in other types");
             }
         }
     }
@@ -543,7 +513,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         String defaultMappingSource;
         if (PercolatorService.TYPE_NAME.equals(mappingType)) {
             defaultMappingSource = this.defaultPercolatorMappingSource;
-        }  else {
+        } else {
             defaultMappingSource = this.defaultMappingSource;
         }
         return documentParser.parse(mappingType, mappingSource, applyDefault ? defaultMappingSource : null);
@@ -582,8 +552,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             return new DocumentMapperForType(mapper, null);
         }
         if (!dynamic) {
-            throw new TypeMissingException(index,
-                    new IllegalStateException("trying to auto create mapping, but dynamic mapping is disabled"), type);
+            throw new TypeMissingException(index, new IllegalStateException("trying to auto create mapping, but dynamic mapping is disabled"), type);
         }
         mapper = parse(type, null, true);
         return new DocumentMapperForType(mapper, mapper.mapping());
@@ -690,7 +659,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
 
     /**
      * Returns an {@link MappedFieldType} which has the given index name.
-     *
+     * <p>
      * If multiple types have fields with the same index name, the first is returned.
      */
     public MappedFieldType indexName(String indexName) {
@@ -699,7 +668,7 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
 
     /**
      * Returns the {@link MappedFieldType} for the give fullName.
-     *
+     * <p>
      * If multiple types have fields with the same full name, the first is returned.
      */
     public MappedFieldType fullName(String fullName) {
@@ -755,14 +724,11 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
             }
             final Mapper.Builder<?, ?> builder = typeParser.parse("__anonymous_" + type, ImmutableMap.<String, Object>of(), parserContext);
             final BuilderContext builderContext = new BuilderContext(indexSettings, new ContentPath(1));
-            fieldType = ((FieldMapper)builder.build(builderContext)).fieldType();
+            fieldType = ((FieldMapper) builder.build(builderContext)).fieldType();
 
             // There is no need to synchronize writes here. In the case of concurrent access, we could just
             // compute some mappers several times, which is not a big deal
-            this.unmappedFieldTypes = ImmutableMap.<String, MappedFieldType>builder()
-                    .putAll(unmappedFieldMappers)
-                    .put(type, fieldType)
-                    .build();
+            this.unmappedFieldTypes = ImmutableMap.<String, MappedFieldType>builder().putAll(unmappedFieldMappers).put(type, fieldType).build();
         }
         return fieldType;
     }
@@ -821,7 +787,9 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         return META_FIELDS.toArray(String.class);
     }
 
-    /** An analyzer wrapper that can lookup fields within the index mappings */
+    /**
+     * An analyzer wrapper that can lookup fields within the index mappings
+     */
     final class MapperAnalyzerWrapper extends DelegatingAnalyzerWrapper {
 
         private final Analyzer defaultAnalyzer;

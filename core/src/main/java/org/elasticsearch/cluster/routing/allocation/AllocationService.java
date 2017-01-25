@@ -94,11 +94,7 @@ public class AllocationService extends AbstractComponent {
                 return s.shardId().toString();
             }
         });
-        logClusterHealthStateChange(
-                new ClusterStateHealth(clusterState),
-                new ClusterStateHealth(clusterState.metaData(), routingTable),
-                "shards started [" + startedShardsAsString + "] ..."
-        );
+        logClusterHealthStateChange(new ClusterStateHealth(clusterState), new ClusterStateHealth(clusterState.metaData(), routingTable), "shards started [" + startedShardsAsString + "] ...");
         return result;
     }
 
@@ -118,8 +114,7 @@ public class AllocationService extends AbstractComponent {
         FailedRerouteAllocation allocation = new FailedRerouteAllocation(allocationDeciders, routingNodes, clusterState.nodes(), failedShards, clusterInfoService.getClusterInfo());
         boolean changed = false;
         for (FailedRerouteAllocation.FailedShard failedShard : failedShards) {
-            changed |= applyFailedShard(allocation, failedShard.shard, true, new UnassignedInfo(UnassignedInfo.Reason.ALLOCATION_FAILED, failedShard.message, failedShard.failure,
-                    System.nanoTime(), System.currentTimeMillis()));
+            changed |= applyFailedShard(allocation, failedShard.shard, true, new UnassignedInfo(UnassignedInfo.Reason.ALLOCATION_FAILED, failedShard.message, failedShard.failure, System.nanoTime(), System.currentTimeMillis()));
         }
         if (!changed) {
             return new RoutingAllocation.Result(false, clusterState.routingTable());
@@ -134,11 +129,7 @@ public class AllocationService extends AbstractComponent {
                 return s.shard.shardId().toString();
             }
         });
-        logClusterHealthStateChange(
-                new ClusterStateHealth(clusterState),
-                new ClusterStateHealth(clusterState.getMetaData(), routingTable),
-                "shards failed [" + failedShardsAsString + "] ..."
-        );
+        logClusterHealthStateChange(new ClusterStateHealth(clusterState), new ClusterStateHealth(clusterState.getMetaData(), routingTable), "shards failed [" + failedShardsAsString + "] ...");
         return result;
     }
 
@@ -190,11 +181,7 @@ public class AllocationService extends AbstractComponent {
         reroute(allocation);
         RoutingTable routingTable = new RoutingTable.Builder().updateNodes(routingNodes).build().validateRaiseException(clusterState.metaData());
         RoutingAllocation.Result result = new RoutingAllocation.Result(true, routingTable, explanations);
-        logClusterHealthStateChange(
-                new ClusterStateHealth(clusterState),
-                new ClusterStateHealth(clusterState.getMetaData(), routingTable),
-                "reroute commands"
-        );
+        logClusterHealthStateChange(new ClusterStateHealth(clusterState), new ClusterStateHealth(clusterState.getMetaData(), routingTable), "reroute commands");
         return result;
     }
 
@@ -223,11 +210,7 @@ public class AllocationService extends AbstractComponent {
         }
         RoutingTable routingTable = new RoutingTable.Builder().updateNodes(routingNodes).build().validateRaiseException(clusterState.metaData());
         RoutingAllocation.Result result = new RoutingAllocation.Result(true, routingTable);
-        logClusterHealthStateChange(
-                new ClusterStateHealth(clusterState),
-                new ClusterStateHealth(clusterState.getMetaData(), routingTable),
-                reason
-        );
+        logClusterHealthStateChange(new ClusterStateHealth(clusterState), new ClusterStateHealth(clusterState.getMetaData(), routingTable), reason);
         return result;
     }
 
@@ -297,9 +280,7 @@ public class AllocationService extends AbstractComponent {
             }
         }
         for (ShardRouting shardToFail : shardsToFail) {
-            changed |= applyFailedShard(allocation, shardToFail, false,
-                    new UnassignedInfo(UnassignedInfo.Reason.ALLOCATION_FAILED, "primary failed while replica initializing",
-                            null, allocation.getCurrentNanoTime(), System.currentTimeMillis()));
+            changed |= applyFailedShard(allocation, shardToFail, false, new UnassignedInfo(UnassignedInfo.Reason.ALLOCATION_FAILED, "primary failed while replica initializing", null, allocation.getCurrentNanoTime(), System.currentTimeMillis()));
         }
 
         // now, go over and elect a new primary if possible, not, from this code block on, if one is elected,
@@ -360,8 +341,7 @@ public class AllocationService extends AbstractComponent {
             changed = true;
             // now, go over all the shards routing on the node, and fail them
             for (ShardRouting shardRouting : node.copyShards()) {
-                UnassignedInfo unassignedInfo = new UnassignedInfo(UnassignedInfo.Reason.NODE_LEFT, "node_left[" + node.nodeId() + "]", null,
-                        allocation.getCurrentNanoTime(), System.currentTimeMillis());
+                UnassignedInfo unassignedInfo = new UnassignedInfo(UnassignedInfo.Reason.NODE_LEFT, "node_left[" + node.nodeId() + "]", null, allocation.getCurrentNanoTime(), System.currentTimeMillis());
                 applyFailedShard(allocation, shardRouting, false, unassignedInfo);
             }
             // its a dead node, remove it, note, its important to remove it *after* we apply failed shard
@@ -520,7 +500,9 @@ public class AllocationService extends AbstractComponent {
         return routingNodes;
     }
 
-    /** ovrride this to control time based decisions during allocation */
+    /**
+     * ovrride this to control time based decisions during allocation
+     */
     protected long currentNanoTime() {
         return System.nanoTime();
     }
