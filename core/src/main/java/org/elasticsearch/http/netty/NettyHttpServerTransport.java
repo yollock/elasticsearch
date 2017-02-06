@@ -107,8 +107,8 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
     public static final int DEFAULT_SETTING_PIPELINING_MAX_EVENTS = 10000;
     public static final String DEFAULT_PORT_RANGE = "9200-9300";
 
-    private static final String[] DEFAULT_CORS_METHODS = { "OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE" };
-    private static final String[] DEFAULT_CORS_HEADERS = { "X-Requested-With", "Content-Type", "Content-Length" };
+    private static final String[] DEFAULT_CORS_METHODS = {"OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE"};
+    private static final String[] DEFAULT_CORS_HEADERS = {"X-Requested-With", "Content-Type", "Content-Length"};
     private static final int DEFAULT_CORS_MAX_AGE = 1728000;
 
     protected final NetworkService networkService;
@@ -225,8 +225,7 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
         }
         this.maxContentLength = maxContentLength;
 
-        logger.debug("using max_chunk_size[{}], max_header_size[{}], max_initial_line_length[{}], max_content_length[{}], receive_predictor[{}->{}], pipelining[{}], pipelining_max_events[{}]",
-                maxChunkSize, maxHeaderSize, maxInitialLineLength, this.maxContentLength, receivePredictorMin, receivePredictorMax, pipelining, pipeliningMaxEvents);
+        logger.debug("using max_chunk_size[{}], max_header_size[{}], max_initial_line_length[{}], max_content_length[{}], receive_predictor[{}->{}], pipelining[{}], pipelining_max_events[{}]", maxChunkSize, maxHeaderSize, maxInitialLineLength, this.maxContentLength, receivePredictorMin, receivePredictorMax, pipelining, pipeliningMaxEvents);
     }
 
     public Settings settings() {
@@ -243,15 +242,9 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
         this.serverOpenChannels = new OpenChannelsHandler(logger);
 
         if (blockingServer) {
-            serverBootstrap = new ServerBootstrap(new OioServerSocketChannelFactory(
-                    Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_boss")),
-                    Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_worker"))
-            ));
+            serverBootstrap = new ServerBootstrap(new OioServerSocketChannelFactory(Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_boss")), Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_worker"))));
         } else {
-            serverBootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
-                    Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_boss")),
-                    Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_worker")),
-                    workerCount));
+            serverBootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_boss")), Executors.newCachedThreadPool(daemonThreadFactory(settings, "http_server_worker")), workerCount));
         }
 
         serverBootstrap.setPipelineFactory(configureServerChannelPipelineFactory());
@@ -327,9 +320,7 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
         }
 
         if (publishPort < 0) {
-            throw new BindHttpException("Failed to auto-resolve http publish port, multiple bound addresses " + boundAddresses +
-                " with distinct ports and none of them matched the publish address (" + publishInetAddress + "). " +
-                "Please specify a unique port by setting http.port or http.publish_port");
+            throw new BindHttpException("Failed to auto-resolve http publish port, multiple bound addresses " + boundAddresses + " with distinct ports and none of them matched the publish address (" + publishInetAddress + "). " + "Please specify a unique port by setting http.port or http.publish_port");
         }
         return publishPort;
     }
@@ -360,11 +351,7 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
         for (int i = 0; i < methods.length; i++) {
             methods[i] = HttpMethod.valueOf(strMethods[i]);
         }
-        return builder.allowedRequestMethods(methods)
-                      .maxAge(settings.getAsInt(SETTING_CORS_MAX_AGE, DEFAULT_CORS_MAX_AGE))
-                      .allowedRequestHeaders(settings.getAsArray(SETTING_CORS_ALLOW_HEADERS, DEFAULT_CORS_HEADERS))
-                      .shortCircuit()
-                      .build();
+        return builder.allowedRequestMethods(methods).maxAge(settings.getAsInt(SETTING_CORS_MAX_AGE, DEFAULT_CORS_MAX_AGE)).allowedRequestHeaders(settings.getAsArray(SETTING_CORS_ALLOW_HEADERS, DEFAULT_CORS_HEADERS)).shortCircuit().build();
     }
 
     private InetSocketTransportAddress bindAddress(final InetAddress hostAddress) {
@@ -490,11 +477,7 @@ public class NettyHttpServerTransport extends AbstractLifecycleComponent<HttpSer
         public ChannelPipeline getPipeline() throws Exception {
             ChannelPipeline pipeline = Channels.pipeline();
             pipeline.addLast("openChannels", transport.serverOpenChannels);
-            HttpRequestDecoder requestDecoder = new HttpRequestDecoder(
-                    (int) transport.maxInitialLineLength.bytes(),
-                    (int) transport.maxHeaderSize.bytes(),
-                    (int) transport.maxChunkSize.bytes()
-            );
+            HttpRequestDecoder requestDecoder = new HttpRequestDecoder((int) transport.maxInitialLineLength.bytes(), (int) transport.maxHeaderSize.bytes(), (int) transport.maxChunkSize.bytes());
             if (transport.maxCumulationBufferCapacity != null) {
                 if (transport.maxCumulationBufferCapacity.bytes() > Integer.MAX_VALUE) {
                     requestDecoder.setMaxCumulationBufferCapacity(Integer.MAX_VALUE);

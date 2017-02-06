@@ -73,8 +73,7 @@ public class HttpServer extends AbstractLifecycleComponent<HttpServer> {
     private final CircuitBreakerService circuitBreakerService;
 
     @Inject
-    public HttpServer(Settings settings, Environment environment, HttpServerTransport transport, RestController restController, NodeService nodeService,
-                      CircuitBreakerService circuitBreakerService) {
+    public HttpServer(Settings settings, Environment environment, HttpServerTransport transport, RestController restController, NodeService nodeService, CircuitBreakerService circuitBreakerService) {
         super(settings);
         this.environment = environment;
         this.transport = transport;

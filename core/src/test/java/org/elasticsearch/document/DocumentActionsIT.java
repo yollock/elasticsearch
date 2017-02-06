@@ -69,7 +69,17 @@ public class DocumentActionsIT extends ESIntegTestCase {
         logger.info("Indexing [type1/1]");
 
         // 插入并索引数据
-        IndexResponse indexResponse = client().prepareIndex().setIndex("test").setType("type1").setId("1").setSource(source("1", "test")).setRefresh(true).execute().actionGet();
+        // source("1", "test") = XContentFactory.jsonBuilder().startObject().field("id", id).field("name", nameValue).endObject();
+        // 第一个是id, 第二个是name, 都是document的内容
+        // 路径 : index/type/document
+        IndexResponse indexResponse = client()//
+            .prepareIndex()//
+            .setIndex("test") //
+            .setType("type1").setId("1") //
+            .setSource(source("1", "test")) //
+            .setRefresh(true) //
+            .execute() //
+            .actionGet();
         assertThat(indexResponse.getIndex(), equalTo(getConcreteIndexName()));
         assertThat(indexResponse.getId(), equalTo("1"));
         assertThat(indexResponse.getType(), equalTo("type1"));
@@ -78,8 +88,7 @@ public class DocumentActionsIT extends ESIntegTestCase {
         assertThat(refreshResponse.getSuccessfulShards(), equalTo(numShards.totalNumShards));
 
 
-//        Thread.sleep(Integer.MAX_VALUE);
-
+        //        Thread.sleep(Integer.MAX_VALUE);
 
 
         logger.info("--> index exists?");
@@ -147,7 +156,7 @@ public class DocumentActionsIT extends ESIntegTestCase {
         logger.info("Index [type1/2]");
         client().index(indexRequest("test").type("type1").id("2").source(source("2", "test2"))).actionGet();
 
-        // 刷盘
+        // 刷盘,将内存中的索引,存储到磁盘中
         logger.info("Flushing");
         FlushResponse flushResult = client().admin().indices().prepareFlush("test").execute().actionGet();
         assertThat(flushResult.getSuccessfulShards(), equalTo(numShards.totalNumShards));

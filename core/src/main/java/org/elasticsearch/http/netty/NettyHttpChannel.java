@@ -66,9 +66,7 @@ public final class NettyHttpChannel extends AbstractRestChannel {
      *                                    HTTP pipelining is disabled.
      * @param detailedErrorsEnabled       true iff error messages should include stack traces.
      */
-    public NettyHttpChannel(NettyHttpServerTransport transport, NettyHttpRequest request,
-                            @Nullable OrderedUpstreamMessageEvent orderedUpstreamMessageEvent,
-                            boolean detailedErrorsEnabled) {
+    public NettyHttpChannel(NettyHttpServerTransport transport, NettyHttpRequest request, @Nullable OrderedUpstreamMessageEvent orderedUpstreamMessageEvent, boolean detailedErrorsEnabled) {
         super(request, detailedErrorsEnabled);
         this.transport = transport;
         this.channel = request.getChannel();
@@ -173,8 +171,7 @@ public final class NettyHttpChannel extends AbstractRestChannel {
     // Determine if the request connection should be closed on completion.
     private boolean isCloseConnection() {
         final boolean http10 = isHttp10();
-        return CLOSE.equalsIgnoreCase(nettyRequest.headers().get(CONNECTION)) ||
-                   (http10 && !KEEP_ALIVE.equalsIgnoreCase(nettyRequest.headers().get(CONNECTION)));
+        return CLOSE.equalsIgnoreCase(nettyRequest.headers().get(CONNECTION)) || (http10 && !KEEP_ALIVE.equalsIgnoreCase(nettyRequest.headers().get(CONNECTION)));
     }
 
     // Create a new {@link HttpResponse} to transmit the response for the netty request.

@@ -1689,8 +1689,10 @@ public abstract class ESIntegTestCase extends ESTestCase {
         NodeConfigurationSource nodeConfigurationSource = new NodeConfigurationSource() {
             @Override
             public Settings nodeSettings(int nodeOrdinal) {
-                return Settings.builder().put(Node.HTTP_ENABLED, false).
-                    put(ESIntegTestCase.this.nodeSettings(nodeOrdinal)).build();
+                return Settings.builder()//
+                    .put(Node.HTTP_ENABLED, true)//
+                    .put(ESIntegTestCase.this.nodeSettings(nodeOrdinal))//
+                    .build();
             }
 
             @Override

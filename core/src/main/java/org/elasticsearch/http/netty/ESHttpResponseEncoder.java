@@ -43,8 +43,7 @@ public class ESHttpResponseEncoder extends HttpResponseEncoder {
             CompositeChannelBuffer ccb = (CompositeChannelBuffer) retVal;
             if (ccb.useGathering() != NettyUtils.DEFAULT_GATHERING) {
                 List<ChannelBuffer> decompose = ccb.decompose(ccb.readerIndex(), ccb.readableBytes());
-                return ChannelBuffers.wrappedBuffer(NettyUtils.DEFAULT_GATHERING,
-                        decompose.toArray(new ChannelBuffer[decompose.size()]));
+                return ChannelBuffers.wrappedBuffer(NettyUtils.DEFAULT_GATHERING, decompose.toArray(new ChannelBuffer[decompose.size()]));
             }
         }
         return retVal;
