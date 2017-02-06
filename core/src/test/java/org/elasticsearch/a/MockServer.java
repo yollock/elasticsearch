@@ -8,7 +8,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class Server extends ESIntegTestCase {
+
+/**
+ * 启动server,通过http形式访问server
+ */
+public class MockServer extends ESIntegTestCase {
 
     protected void createIndex() {
         createIndex(getConcreteIndexName());
@@ -31,13 +35,13 @@ public class Server extends ESIntegTestCase {
         // 第一个是id, 第二个是name, 都是document的内容
         // 路径 : index/type/document
         IndexResponse indexResponse = client()//
-            .prepareIndex()//
-            .setIndex("yoll_index") //
-            .setType("yoll_type").setId("1") //
-            .setSource(source("1", "test")) //
-            .setRefresh(true) //
-            .execute() //
-            .actionGet();
+                .prepareIndex()//
+                .setIndex("yoll_index") //
+                .setType("yoll_type").setId("1") //
+                .setSource(source("1", "test")) //
+                .setRefresh(true) //
+                .execute() //
+                .actionGet();
 
 
         Thread.sleep(Integer.MAX_VALUE);
