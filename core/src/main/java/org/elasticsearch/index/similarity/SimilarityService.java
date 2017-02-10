@@ -35,19 +35,16 @@ public class SimilarityService extends AbstractIndexComponent {
     private final Similarity perFieldSimilarity;
 
     @Inject
-    public SimilarityService(Index index, IndexSettingsService indexSettingsService,
-                             final SimilarityLookupService similarityLookupService, final MapperService mapperService) {
+    public SimilarityService(Index index, IndexSettingsService indexSettingsService, final SimilarityLookupService similarityLookupService, final MapperService mapperService) {
         super(index, indexSettingsService.getSettings());
         this.similarityLookupService = similarityLookupService;
         this.mapperService = mapperService;
 
         Similarity defaultSimilarity = similarityLookupService.similarity(SimilarityLookupService.DEFAULT_SIMILARITY).get();
         // Expert users can configure the base type as being different to default, but out-of-box we use default.
-        Similarity baseSimilarity = (similarityLookupService.similarity("base") != null) ? similarityLookupService.similarity("base").get() :
-                defaultSimilarity;
+        Similarity baseSimilarity = (similarityLookupService.similarity("base") != null) ? similarityLookupService.similarity("base").get() : defaultSimilarity;
 
-        this.perFieldSimilarity = (mapperService != null) ? new PerFieldSimilarity(defaultSimilarity, baseSimilarity, mapperService) :
-                defaultSimilarity;
+        this.perFieldSimilarity = (mapperService != null) ? new PerFieldSimilarity(defaultSimilarity, baseSimilarity, mapperService) : defaultSimilarity;
     }
 
     public Similarity similarity() {

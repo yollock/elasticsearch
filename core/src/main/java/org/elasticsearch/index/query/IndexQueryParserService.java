@@ -91,11 +91,14 @@ public class IndexQueryParserService extends AbstractIndexComponent {
     private final boolean defaultAllowUnmappedFields;
 
     @Inject
-    public IndexQueryParserService(Index index, IndexSettingsService indexSettingsService,
-                                   IndicesQueriesRegistry indicesQueriesRegistry,
-                                   ScriptService scriptService, AnalysisService analysisService,
-                                   MapperService mapperService, IndexCache indexCache, IndexFieldDataService fieldDataService,
-                                   BitsetFilterCache bitsetFilterCache,
+    public IndexQueryParserService(Index index, //
+                                   IndexSettingsService indexSettingsService,//
+                                   IndicesQueriesRegistry indicesQueriesRegistry,//
+                                   ScriptService scriptService, AnalysisService analysisService,//
+                                   MapperService mapperService, //
+                                   IndexCache indexCache, //
+                                   IndexFieldDataService fieldDataService,//
+                                   BitsetFilterCache bitsetFilterCache,//
                                    @Nullable SimilarityService similarityService) {
         super(index, indexSettingsService.getSettings());
         this.indexSettingsService = indexSettingsService;

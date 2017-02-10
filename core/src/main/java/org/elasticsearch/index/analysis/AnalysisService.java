@@ -62,22 +62,29 @@ public class AnalysisService extends AbstractIndexComponent implements Closeable
 
 
     @Inject
-    public AnalysisService(Index index, IndexSettingsService indexSettingsService, @Nullable IndicesAnalysisService indicesAnalysisService,
-                           @Nullable Map<String, AnalyzerProviderFactory> analyzerFactoryFactories,
-                           @Nullable Map<String, TokenizerFactoryFactory> tokenizerFactoryFactories,
-                           @Nullable Map<String, CharFilterFactoryFactory> charFilterFactoryFactories,
+    public AnalysisService(Index index, IndexSettingsService indexSettingsService, //
+                           @Nullable IndicesAnalysisService indicesAnalysisService,//
+                           @Nullable Map<String, AnalyzerProviderFactory> analyzerFactoryFactories,//
+                           @Nullable Map<String, TokenizerFactoryFactory> tokenizerFactoryFactories,//
+                           @Nullable Map<String, CharFilterFactoryFactory> charFilterFactoryFactories,//
                            @Nullable Map<String, TokenFilterFactoryFactory> tokenFilterFactoryFactories) {
-        this(index, indexSettingsService.getSettings(), indicesAnalysisService, analyzerFactoryFactories, tokenizerFactoryFactories,
-                charFilterFactoryFactories, tokenFilterFactoryFactories);
+        this(index, //
+                indexSettingsService.getSettings(), //
+                indicesAnalysisService, //
+                analyzerFactoryFactories, //
+                tokenizerFactoryFactories,//
+                charFilterFactoryFactories, //
+                tokenFilterFactoryFactories);
 
     }
 
     //package private for testing
-    AnalysisService(Index index, Settings indexSettings, @Nullable IndicesAnalysisService indicesAnalysisService,
-                           @Nullable Map<String, AnalyzerProviderFactory> analyzerFactoryFactories,
-                           @Nullable Map<String, TokenizerFactoryFactory> tokenizerFactoryFactories,
-                           @Nullable Map<String, CharFilterFactoryFactory> charFilterFactoryFactories,
-                           @Nullable Map<String, TokenFilterFactoryFactory> tokenFilterFactoryFactories) {
+    AnalysisService(Index index, Settings indexSettings, //
+                    @Nullable IndicesAnalysisService indicesAnalysisService,//
+                    @Nullable Map<String, AnalyzerProviderFactory> analyzerFactoryFactories,//
+                    @Nullable Map<String, TokenizerFactoryFactory> tokenizerFactoryFactories,//
+                    @Nullable Map<String, CharFilterFactoryFactory> charFilterFactoryFactories,//
+                    @Nullable Map<String, TokenFilterFactoryFactory> tokenFilterFactoryFactories) {
         super(index, indexSettings);
         Settings defaultSettings = Settings.builder().put(IndexMetaData.SETTING_VERSION_CREATED, Version.indexCreated(indexSettings)).build();
         Map<String, TokenizerFactory> tokenizers = newHashMap();

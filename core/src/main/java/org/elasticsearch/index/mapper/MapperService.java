@@ -79,7 +79,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.elasticsearch.common.collect.MapBuilder.newMapBuilder;
 
 /**
- *
+ * ME：字段类型的映射
  */
 public class MapperService extends AbstractIndexComponent implements Closeable {
 
@@ -288,10 +288,10 @@ public class MapperService extends AbstractIndexComponent implements Closeable {
         } else {
             synchronized (this) {
                 final boolean applyDefault =
-                    // the default was already applied if we are recovering
-                    reason != MergeReason.MAPPING_RECOVERY
-                        // only apply the default mapping if we don't have the type yet
-                        && mappers.containsKey(type) == false;
+                        // the default was already applied if we are recovering
+                        reason != MergeReason.MAPPING_RECOVERY
+                                // only apply the default mapping if we don't have the type yet
+                                && mappers.containsKey(type) == false;
                 DocumentMapper mergeWith = parse(type, mappingSource, applyDefault);
                 return merge(mergeWith, reason, updateAllTypes);
             }

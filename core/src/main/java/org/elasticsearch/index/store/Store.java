@@ -22,12 +22,33 @@ package org.elasticsearch.index.store;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.apache.lucene.codecs.CodecUtil;
-import org.apache.lucene.index.*;
-import org.apache.lucene.store.*;
-import org.apache.lucene.util.*;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexCommit;
+import org.apache.lucene.index.IndexFileNames;
+import org.apache.lucene.index.IndexFormatTooNewException;
+import org.apache.lucene.index.IndexFormatTooOldException;
+import org.apache.lucene.index.IndexNotFoundException;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.SegmentCommitInfo;
+import org.apache.lucene.index.SegmentInfos;
+import org.apache.lucene.store.AlreadyClosedException;
+import org.apache.lucene.store.BufferedChecksum;
+import org.apache.lucene.store.ByteArrayDataInput;
+import org.apache.lucene.store.ChecksumIndexInput;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FilterDirectory;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.store.IndexInput;
+import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.store.Lock;
+import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.ArrayUtil;
+import org.apache.lucene.util.BytesRef;
+import org.apache.lucene.util.BytesRefBuilder;
+import org.apache.lucene.util.IOUtils;
+import org.apache.lucene.util.Version;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ExceptionsHelper;
-import org.apache.lucene.util.Version;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.collect.Tuple;
@@ -54,11 +75,21 @@ import org.elasticsearch.index.settings.IndexSettingsService;
 import org.elasticsearch.index.shard.AbstractIndexShardComponent;
 import org.elasticsearch.index.shard.ShardId;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.EOFException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.zip.Adler32;
@@ -88,7 +119,7 @@ import java.util.zip.Checksum;
 public class Store extends AbstractIndexShardComponent implements Closeable, RefCounted {
 
     static final String CODEC = "store";
-    static final int VERSION_WRITE_THROWABLE= 2; // we write throwable since 2.0
+    static final int VERSION_WRITE_THROWABLE = 2; // we write throwable since 2.0
     static final int VERSION_STACK_TRACE = 1; // we write the stack trace too since 1.4.0
     static final int VERSION_START = 0;
     static final int VERSION = VERSION_WRITE_THROWABLE;
@@ -494,8 +525,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 String checksum = Store.digestToString(CodecUtil.checksumEntireFile(input));
                 // throw exception if metadata is inconsistent
                 if (!checksum.equals(md.checksum())) {
-                    throw new CorruptIndexException("inconsistent metadata: lucene checksum=" + checksum +
-                            ", metadata checksum=" + md.checksum(), input);
+                    throw new CorruptIndexException("inconsistent metadata: lucene checksum=" + checksum + ", metadata checksum=" + md.checksum(), input);
                 }
             } else if (md.hasLegacyChecksum()) {
                 // legacy checksum verification - no footer that we need to omit in the checksum!
@@ -512,8 +542,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 }
                 String adler32 = Store.digestToString(checksum.getValue());
                 if (!adler32.equals(md.checksum())) {
-                    throw new CorruptIndexException("checksum failed (hardware problem?) : expected=" + md.checksum() +
-                            " actual=" + adler32, input);
+                    throw new CorruptIndexException("checksum failed (hardware problem?) : expected=" + md.checksum() + " actual=" + adler32, input);
                 }
             }
         }
@@ -627,8 +656,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     dir.deleteFile(reason, existingFile);
                     // FNF should not happen since we hold a write lock?
                 } catch (IOException ex) {
-                    if (existingFile.startsWith(IndexFileNames.SEGMENTS)
-                            || existingFile.equals(IndexFileNames.OLD_SEGMENTS_GEN)) {
+                    if (existingFile.startsWith(IndexFileNames.SEGMENTS) || existingFile.equals(IndexFileNames.OLD_SEGMENTS_GEN)) {
                         // TODO do we need to also fail this if we can't delete the pending commit file?
                         // if one of those files can't be deleted we better fail the cleanup otherwise we might leave an old commit point around?
                         throw new IllegalStateException("Can't delete " + existingFile + " - cleanup failed", ex);
@@ -662,11 +690,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
 
                     // this check ensures that the two files are consistent ie. if we don't have checksums only the rest needs to match we are just
                     // verifying that we are consistent on both ends source and target
-                    final boolean hashAndLengthEqual = (
-                            local.checksum() == null
-                                    && remote.checksum() == null
-                                    && local.hash().equals(remote.hash())
-                                    && local.length() == remote.length());
+                    final boolean hashAndLengthEqual = (local.checksum() == null && remote.checksum() == null && local.hash().equals(remote.hash()) && local.length() == remote.length());
                     final boolean consistent = hashAndLengthEqual || same;
                     if (consistent == false) {
                         logger.debug("Files are different on the recovery target: {} ", recoveryDiff);
@@ -675,8 +699,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 }
             } else {
                 logger.debug("Files are missing on the recovery target: {} ", recoveryDiff);
-                throw new IllegalStateException("Files are missing on the recovery target: [different="
-                        + recoveryDiff.different + ", missing=" + recoveryDiff.missing + ']', null);
+                throw new IllegalStateException("Files are missing on the recovery target: [different=" + recoveryDiff.different + ", missing=" + recoveryDiff.missing + ']', null);
             }
         }
     }
@@ -856,8 +879,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     // Lucene checks the checksum after it tries to lookup the codec etc.
                     // in that case we might get only IAE or similar exceptions while we are really corrupt...
                     // TODO we should check the checksum in lucene if we hit an exception
-                    logger.warn("failed to build store metadata. checking segment info integrity (with commit [{}])",
-                            ex, commit == null ? "no" : "yes");
+                    logger.warn("failed to build store metadata. checking segment info integrity (with commit [{}])", ex, commit == null ? "no" : "yes");
                     Lucene.checkSegmentInfoIntegrity(directory);
                 } catch (CorruptIndexException | IndexFormatTooOldException | IndexFormatTooNewException cex) {
                     cex.addSuppressed(ex);
@@ -1075,8 +1097,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                 }
             }
             RecoveryDiff recoveryDiff = new RecoveryDiff(Collections.unmodifiableList(identical), Collections.unmodifiableList(different), Collections.unmodifiableList(missing));
-            assert recoveryDiff.size() == this.metadata.size() - (metadata.containsKey(IndexFileNames.OLD_SEGMENTS_GEN) ? 1 : 0)
-                    : "some files are missing recoveryDiff size: [" + recoveryDiff.size() + "] metadata size: [" + this.metadata.size() + "] contains  segments.gen: [" + metadata.containsKey(IndexFileNames.OLD_SEGMENTS_GEN) + "]";
+            assert recoveryDiff.size() == this.metadata.size() - (metadata.containsKey(IndexFileNames.OLD_SEGMENTS_GEN) ? 1 : 0) : "some files are missing recoveryDiff size: [" + recoveryDiff.size() + "] metadata size: [" + this.metadata.size() + "] contains  segments.gen: [" + metadata.containsKey(IndexFileNames.OLD_SEGMENTS_GEN) + "]";
             return recoveryDiff;
         }
 
@@ -1184,11 +1205,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
 
         @Override
         public String toString() {
-            return "RecoveryDiff{" +
-                    "identical=" + identical +
-                    ", different=" + different +
-                    ", missing=" + missing +
-                    '}';
+            return "RecoveryDiff{" + "identical=" + identical + ", different=" + different + ", missing=" + missing + '}';
         }
     }
 
@@ -1217,7 +1234,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
 
         synchronized void writeChecksums(Directory directory, Map<String, String> checksums, long lastVersion) throws IOException {
             // Make sure if clock goes backwards we still move version forwards:
-            long nextVersion = Math.max(lastVersion+1, System.currentTimeMillis());
+            long nextVersion = Math.max(lastVersion + 1, System.currentTimeMillis());
             final String checksumName = CHECKSUMS_PREFIX + nextVersion;
             try (IndexOutput output = directory.createOutput(checksumName, IOContext.DEFAULT)) {
                 output.writeInt(0); // version
@@ -1283,9 +1300,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     return;
                 }
             }
-            throw new CorruptIndexException("verification failed (hardware problem?) : expected=" + metadata.checksum() +
-                    " actual=" + actualChecksum + " footer=" + footerDigest +" writtenLength=" + writtenBytes + " expectedLength=" + metadata.length() +
-                    " (resource=" + metadata.toString() + ")", "VerifyingIndexOutput(" + metadata.name() + ")");
+            throw new CorruptIndexException("verification failed (hardware problem?) : expected=" + metadata.checksum() + " actual=" + actualChecksum + " footer=" + footerDigest + " writtenLength=" + writtenBytes + " expectedLength=" + metadata.length() + " (resource=" + metadata.toString() + ")", "VerifyingIndexOutput(" + metadata.name() + ")");
         }
 
         @Override
@@ -1296,13 +1311,13 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
                     readAndCompareChecksum();
                 }
                 final long indexLong = writtenBytes - checksumPosition;
-                if ((int)indexLong != indexLong) {
+                if ((int) indexLong != indexLong) {
                     throw new ArithmeticException("integer overflow");
                 }
-                final int index = (int)indexLong;
+                final int index = (int) indexLong;
                 if (index < footerChecksum.length) {
                     footerChecksum[index] = b;
-                    if (index == footerChecksum.length-1) {
+                    if (index == footerChecksum.length - 1) {
                         verify(); // we have recorded the entire checksum
                     }
                 } else {
@@ -1316,9 +1331,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
         private void readAndCompareChecksum() throws IOException {
             actualChecksum = digestToString(getChecksum());
             if (!metadata.checksum().equals(actualChecksum)) {
-                throw new CorruptIndexException("checksum failed (hardware problem?) : expected=" + metadata.checksum() +
-                        " actual=" + actualChecksum +
-                        " (resource=" + metadata.toString() + ")", "VerifyingIndexOutput(" + metadata.name() + ")");
+                throw new CorruptIndexException("checksum failed (hardware problem?) : expected=" + metadata.checksum() + " actual=" + actualChecksum + " (resource=" + metadata.toString() + ")", "VerifyingIndexOutput(" + metadata.name() + ")");
             }
         }
 
@@ -1326,7 +1339,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
         public void writeBytes(byte[] b, int offset, int length) throws IOException {
             if (writtenBytes + length > checksumPosition) {
                 for (int i = 0; i < length; i++) { // don't optimze writing the last block of bytes
-                    writeByte(b[offset+i]);
+                    writeByte(b[offset + i]);
                 }
             } else {
                 out.writeBytes(b, offset, length);
@@ -1377,8 +1390,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
         }
 
         @Override
-        public void readBytes(byte[] b, int offset, int len)
-                throws IOException {
+        public void readBytes(byte[] b, int offset, int len) throws IOException {
             long pos = input.getFilePointer();
             input.readBytes(b, offset, len);
             if (pos + len > verifiedPosition) {
@@ -1461,8 +1473,7 @@ public class Store extends AbstractIndexShardComponent implements Closeable, Ref
             if (getChecksum() == storedChecksum) {
                 return storedChecksum;
             }
-            throw new CorruptIndexException("verification failed : calculated=" + Store.digestToString(getChecksum()) +
-                    " stored=" + Store.digestToString(storedChecksum), this);
+            throw new CorruptIndexException("verification failed : calculated=" + Store.digestToString(getChecksum()) + " stored=" + Store.digestToString(storedChecksum), this);
         }
 
     }

@@ -117,7 +117,7 @@ public class IndexAliasesService extends AbstractIndexComponent {
         return aliases.containsKey(alias);
     }
 
-   void remove(String alias) {
-       aliases = ImmutableOpenMap.builder(aliases).fRemove(alias).build();
+    void remove(String alias) {
+        aliases = ImmutableOpenMap.builder(aliases).fRemove(alias).build();
     }
 }
