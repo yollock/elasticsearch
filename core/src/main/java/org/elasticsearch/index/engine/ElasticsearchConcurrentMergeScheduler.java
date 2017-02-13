@@ -87,7 +87,12 @@ class ElasticsearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
         onGoingMerges.add(onGoingMerge);
 
         if (logger.isTraceEnabled()) {
-            logger.trace("merge [{}] starting..., merging [{}] segments, [{}] docs, [{}] size, into [{}] estimated_size", OneMergeHelper.getSegmentName(merge), merge.segments.size(), totalNumDocs, new ByteSizeValue(totalSizeInBytes), new ByteSizeValue(merge.estimatedMergeBytes));
+            logger.trace("merge [{}] starting..., merging [{}] segments, [{}] docs, [{}] size, into [{}] estimated_size",//
+                    OneMergeHelper.getSegmentName(merge), //
+                    merge.segments.size(), //
+                    totalNumDocs, //
+                    new ByteSizeValue(totalSizeInBytes), //
+                    new ByteSizeValue(merge.estimatedMergeBytes));
         }
         try {
             beforeMerge(onGoingMerge);
@@ -112,16 +117,16 @@ class ElasticsearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
             totalMergeStoppedTime.inc(stoppedMS);
             totalMergeThrottledTime.inc(throttledMS);
 
-            String message = String.format(Locale.ROOT,
-                                           "merge segment [%s] done: took [%s], [%,.1f MB], [%,d docs], [%s stopped], [%s throttled], [%,.1f MB written], [%,.1f MB/sec throttle]",
-                                           OneMergeHelper.getSegmentName(merge),
-                                           TimeValue.timeValueMillis(tookMS),
-                                           totalSizeInBytes/1024f/1024f,
-                                           totalNumDocs,
-                                           TimeValue.timeValueMillis(stoppedMS),
-                                           TimeValue.timeValueMillis(throttledMS),
-                                           merge.rateLimiter.getTotalBytesWritten()/1024f/1024f,
-                                           merge.rateLimiter.getMBPerSec());
+            String message = String.format(Locale.ROOT,//
+                    "merge segment [%s] done: took [%s], [%,.1f MB], [%,d docs], [%s stopped], [%s throttled], [%,.1f MB written], [%,.1f MB/sec throttle]",//
+                    OneMergeHelper.getSegmentName(merge),//
+                    TimeValue.timeValueMillis(tookMS),//
+                    totalSizeInBytes / 1024f / 1024f,//
+                    totalNumDocs,//
+                    TimeValue.timeValueMillis(stoppedMS),//
+                    TimeValue.timeValueMillis(throttledMS),//
+                    merge.rateLimiter.getTotalBytesWritten() / 1024f / 1024f,//
+                    merge.rateLimiter.getMBPerSec());
 
             if (tookMS > 20000) { // if more than 20 seconds, DEBUG log it
                 logger.debug(message);
@@ -163,10 +168,15 @@ class ElasticsearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 
     MergeStats stats() {
         final MergeStats mergeStats = new MergeStats();
-        mergeStats.add(totalMerges.count(), totalMerges.sum(), totalMergesNumDocs.count(), totalMergesSizeInBytes.count(),
-                currentMerges.count(), currentMergesNumDocs.count(), currentMergesSizeInBytes.count(),
-                totalMergeStoppedTime.count(),
-                totalMergeThrottledTime.count(),
+        mergeStats.add(totalMerges.count(), //
+                totalMerges.sum(), //
+                totalMergesNumDocs.count(), //
+                totalMergesSizeInBytes.count(),//
+                currentMerges.count(), //
+                currentMergesNumDocs.count(), //
+                currentMergesSizeInBytes.count(),//
+                totalMergeStoppedTime.count(),//
+                totalMergeThrottledTime.count(),//
                 config.isAutoThrottle() ? getIORateLimitMBPerSec() : Double.POSITIVE_INFINITY);
         return mergeStats;
     }
@@ -182,7 +192,7 @@ class ElasticsearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
         boolean isEnabled = getIORateLimitMBPerSec() != Double.POSITIVE_INFINITY;
         if (config.isAutoThrottle() && isEnabled == false) {
             enableAutoIOThrottle();
-        } else if (config.isAutoThrottle() == false && isEnabled){
+        } else if (config.isAutoThrottle() == false && isEnabled) {
             disableAutoIOThrottle();
         }
     }
