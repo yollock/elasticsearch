@@ -1,0 +1,9 @@
+
+部署环境
+
+1.启动服务端
+org.elasticsearch.a.MockServer
+
+2.使用HTTP方式,操作ES实例
+
+

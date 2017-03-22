@@ -28,8 +28,7 @@ public final class RateLimitedFSDirectory extends FilterDirectory {
 
     private final StoreRateLimiting.Listener rateListener;
 
-    public RateLimitedFSDirectory(Directory wrapped, StoreRateLimiting.Provider rateLimitingProvider,
-                                  StoreRateLimiting.Listener rateListener) {
+    public RateLimitedFSDirectory(Directory wrapped, StoreRateLimiting.Provider rateLimitingProvider, StoreRateLimiting.Listener rateListener) {
         super(wrapped);
         this.rateLimitingProvider = rateLimitingProvider;
         this.rateListener = rateListener;

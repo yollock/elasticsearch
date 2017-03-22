@@ -80,7 +80,7 @@ public class CustomFieldQuery extends FieldQuery {
             super.flatten(sourceQuery, reader, flatQueries, boost);
         }
     }
-    
+
     private void convertMultiPhraseQuery(int currentPos, int[] termsIdx, MultiPhraseQuery orig, List<Term[]> terms, int[] pos, IndexReader reader, Collection<Query> flatQueries) throws IOException {
         if (currentPos == 0) {
             // if we have more than 16 terms 
@@ -91,7 +91,7 @@ public class CustomFieldQuery extends FieldQuery {
             if (numTerms > 16) {
                 for (Term[] currentPosTerm : terms) {
                     for (Term term : currentPosTerm) {
-                        super.flatten(new TermQuery(term), reader, flatQueries, orig.getBoost());    
+                        super.flatten(new TermQuery(term), reader, flatQueries, orig.getBoost());
                     }
                 }
                 return;
@@ -114,7 +114,7 @@ public class CustomFieldQuery extends FieldQuery {
             Term[] t = terms.get(currentPos);
             for (int i = 0; i < t.length; i++) {
                 termsIdx[currentPos] = i;
-                convertMultiPhraseQuery(currentPos+1, termsIdx, orig, terms, pos, reader, flatQueries);
+                convertMultiPhraseQuery(currentPos + 1, termsIdx, orig, terms, pos, reader, flatQueries);
             }
         }
     }

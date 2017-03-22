@@ -37,9 +37,7 @@ public class StoreRateLimiting {
     }
 
     public static enum Type {
-        NONE,
-        MERGE,
-        ALL;
+        NONE, MERGE, ALL;
 
         public static Type fromString(String type) {
             if ("none".equalsIgnoreCase(type)) {

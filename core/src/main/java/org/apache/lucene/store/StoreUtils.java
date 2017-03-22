@@ -30,15 +30,15 @@ public final class StoreUtils {
 
     public static String toString(Directory directory) {
         if (directory instanceof NIOFSDirectory) {
-            NIOFSDirectory niofsDirectory = (NIOFSDirectory)directory;
+            NIOFSDirectory niofsDirectory = (NIOFSDirectory) directory;
             return "niofs(" + niofsDirectory.getDirectory() + ")";
         }
         if (directory instanceof MMapDirectory) {
-            MMapDirectory mMapDirectory = (MMapDirectory)directory;
+            MMapDirectory mMapDirectory = (MMapDirectory) directory;
             return "mmapfs(" + mMapDirectory.getDirectory() + ")";
         }
         if (directory instanceof SimpleFSDirectory) {
-            SimpleFSDirectory simpleFSDirectory = (SimpleFSDirectory)directory;
+            SimpleFSDirectory simpleFSDirectory = (SimpleFSDirectory) directory;
             return "simplefs(" + simpleFSDirectory.getDirectory() + ")";
         }
         if (directory instanceof FileSwitchDirectory) {
@@ -51,7 +51,7 @@ public final class StoreUtils {
 
     public static String toString(Directory[] directories) {
         String[] strings = new String[directories.length];
-        for(int i=0;i<directories.length;i++) {
+        for (int i = 0; i < directories.length; i++) {
             strings[i] = toString(directories[i]);
         }
         return Arrays.toString(strings);

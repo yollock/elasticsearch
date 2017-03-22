@@ -57,9 +57,16 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
     private final TransportShardMultiPercolateAction shardMultiPercolateAction;
 
     @Inject
-    public TransportMultiPercolateAction(Settings settings, ThreadPool threadPool, TransportShardMultiPercolateAction shardMultiPercolateAction,
-                                         ClusterService clusterService, TransportService transportService, PercolatorService percolatorService,
-                                         TransportMultiGetAction multiGetAction, ActionFilters actionFilters, IndexNameExpressionResolver indexNameExpressionResolver) {
+    public TransportMultiPercolateAction(Settings settings, //
+                                         ThreadPool threadPool, //
+                                         TransportShardMultiPercolateAction shardMultiPercolateAction,//
+                                         ClusterService clusterService, //
+                                         TransportService transportService, //
+                                         PercolatorService percolatorService, //
+                                         TransportMultiGetAction multiGetAction, //
+                                         ActionFilters actionFilters, //
+                                         IndexNameExpressionResolver indexNameExpressionResolver //
+    ) {
         super(settings, MultiPercolateAction.NAME, threadPool, transportService, actionFilters, indexNameExpressionResolver, MultiPercolateRequest.class);
         this.shardMultiPercolateAction = shardMultiPercolateAction;
         this.clusterService = clusterService;
@@ -77,7 +84,7 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
         // so we need to keep track for what percolate request we had a get request
         final IntArrayList getRequestSlots = new IntArrayList();
         List<GetRequest> existingDocsRequests = new ArrayList<>();
-        for (int slot = 0;  slot < request.requests().size(); slot++) {
+        for (int slot = 0; slot < request.requests().size(); slot++) {
             PercolateRequest percolateRequest = request.requests().get(slot);
             percolateRequest.startTime = System.currentTimeMillis();
             percolateRequests.add(percolateRequest);
@@ -90,10 +97,7 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
         if (!existingDocsRequests.isEmpty()) {
             final MultiGetRequest multiGetRequest = new MultiGetRequest(request);
             for (GetRequest getRequest : existingDocsRequests) {
-                multiGetRequest.add(
-                        new MultiGetRequest.Item(getRequest.index(), getRequest.type(), getRequest.id())
-                        .routing(getRequest.routing())
-                );
+                multiGetRequest.add(new MultiGetRequest.Item(getRequest.index(), getRequest.type(), getRequest.id()).routing(getRequest.routing()));
             }
 
             multiGetAction.execute(multiGetRequest, new ActionListener<MultiGetResponse>() {
@@ -157,14 +161,14 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
             // Keep track what slots belong to what shard, in case a request to a shard fails on all copies
             shardToSlots = new HashMap<>();
             int expectedResults = 0;
-            for (int slot = 0;  slot < percolateRequests.size(); slot++) {
+            for (int slot = 0; slot < percolateRequests.size(); slot++) {
                 Object element = percolateRequests.get(slot);
                 assert element != null;
                 if (element instanceof PercolateRequest) {
                     PercolateRequest percolateRequest = (PercolateRequest) element;
                     String[] concreteIndices;
                     try {
-                         concreteIndices = indexNameExpressionResolver.concreteIndices(clusterState, percolateRequest);
+                        concreteIndices = indexNameExpressionResolver.concreteIndices(clusterState, percolateRequest);
                     } catch (IndexNotFoundException e) {
                         reducedResponses.set(slot, e);
                         responsesByItemAndShard.set(slot, new AtomicReferenceArray(0));
@@ -173,9 +177,7 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
                     }
                     Map<String, Set<String>> routing = indexNameExpressionResolver.resolveSearchRouting(clusterState, percolateRequest.routing(), percolateRequest.indices());
                     // TODO: I only need shardIds, ShardIterator(ShardRouting) is only needed in TransportShardMultiPercolateAction
-                    GroupShardsIterator shards = clusterService.operationRouting().searchShards(
-                            clusterState, concreteIndices, routing, percolateRequest.preference()
-                    );
+                    GroupShardsIterator shards = clusterService.operationRouting().searchShards(clusterState, concreteIndices, routing, percolateRequest.preference());
                     if (shards.size() == 0) {
                         reducedResponses.set(slot, new UnavailableShardsException(null, "No shards available"));
                         responsesByItemAndShard.set(slot, new AtomicReferenceArray(0));
@@ -311,9 +313,9 @@ public class TransportMultiPercolateAction extends HandledTransportAction<MultiP
                 if (element instanceof PercolateResponse) {
                     finalResponse[slot] = new MultiPercolateResponse.Item((PercolateResponse) element);
                 } else if (element instanceof Throwable) {
-                    finalResponse[slot] = new MultiPercolateResponse.Item((Throwable)element);
+                    finalResponse[slot] = new MultiPercolateResponse.Item((Throwable) element);
                 } else if (element instanceof MultiGetResponse.Failure) {
-                    finalResponse[slot] = new MultiPercolateResponse.Item(((MultiGetResponse.Failure)element).getFailure());
+                    finalResponse[slot] = new MultiPercolateResponse.Item(((MultiGetResponse.Failure) element).getFailure());
                 }
             }
             finalListener.onResponse(new MultiPercolateResponse(finalResponse));
