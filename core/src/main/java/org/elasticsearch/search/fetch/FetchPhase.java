@@ -154,8 +154,7 @@ public class FetchPhase implements SearchPhase {
                 fieldsVisitor = new AllFieldsVisitor(); // load everything, including _source
             } else if (fieldNames != null || fieldNamePatterns != null) {
                 boolean loadSource = extractFieldNames != null || context.sourceRequested();
-                fieldsVisitor = new CustomFieldsVisitor(fieldNames == null ? Collections.<String>emptySet() : fieldNames,
-                        fieldNamePatterns == null ? Collections.<String>emptyList() : fieldNamePatterns, loadSource);
+                fieldsVisitor = new CustomFieldsVisitor(fieldNames == null ? Collections.<String>emptySet() : fieldNames, fieldNamePatterns == null ? Collections.<String>emptyList() : fieldNamePatterns, loadSource);
             } else {
                 fieldsVisitor = new FieldsVisitor(extractFieldNames != null || context.sourceRequested());
             }
@@ -339,8 +338,7 @@ public class FetchPhase implements SearchPhase {
             if (loadAllStored) {
                 nestedFieldsVisitor = new AllFieldsVisitor();
             } else if (fieldNames != null || fieldNamePatterns != null) {
-                nestedFieldsVisitor = new CustomFieldsVisitor(fieldNames == null ? Collections.<String>emptySet() : fieldNames,
-                        fieldNamePatterns == null ? Collections.<String>emptyList() : fieldNamePatterns, false);
+                nestedFieldsVisitor = new CustomFieldsVisitor(fieldNames == null ? Collections.<String>emptySet() : fieldNames, fieldNamePatterns == null ? Collections.<String>emptyList() : fieldNamePatterns, false);
             }
 
             if (nestedFieldsVisitor != null) {

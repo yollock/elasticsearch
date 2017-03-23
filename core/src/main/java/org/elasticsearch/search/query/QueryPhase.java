@@ -73,28 +73,8 @@ public class QueryPhase implements SearchPhase {
     @Override
     public Map<String, ? extends SearchParseElement> parseElements() {
         ImmutableMap.Builder<String, SearchParseElement> parseElements = ImmutableMap.builder();
-        parseElements.put("from", new FromParseElement()).put("size", new SizeParseElement())
-                .put("indices_boost", new IndicesBoostParseElement())
-                .put("indicesBoost", new IndicesBoostParseElement())
-                .put("query", new QueryParseElement())
-                .put("queryBinary", new QueryBinaryParseElement())
-                .put("query_binary", new QueryBinaryParseElement())
-                .put("filter", new PostFilterParseElement()) // For bw comp reason, should be removed in version 1.1
-                .put("post_filter", new PostFilterParseElement())
-                .put("postFilter", new PostFilterParseElement())
-                .put("filterBinary", new FilterBinaryParseElement())
-                .put("filter_binary", new FilterBinaryParseElement())
-                .put("sort", new SortParseElement())
-                .put("trackScores", new TrackScoresParseElement())
-                .put("track_scores", new TrackScoresParseElement())
-                .put("min_score", new MinScoreParseElement())
-                .put("minScore", new MinScoreParseElement())
-                .put("timeout", new TimeoutParseElement())
-                .put("terminate_after", new TerminateAfterParseElement())
-                .put("profile", new ProfileParseElement())
-                .putAll(aggregationPhase.parseElements())
-                .putAll(suggestPhase.parseElements())
-                .putAll(rescorePhase.parseElements());
+        parseElements.put("from", new FromParseElement()).put("size", new SizeParseElement()).put("indices_boost", new IndicesBoostParseElement()).put("indicesBoost", new IndicesBoostParseElement()).put("query", new QueryParseElement()).put("queryBinary", new QueryBinaryParseElement()).put("query_binary", new QueryBinaryParseElement()).put("filter", new PostFilterParseElement()) // For bw comp reason, should be removed in version 1.1
+                .put("post_filter", new PostFilterParseElement()).put("postFilter", new PostFilterParseElement()).put("filterBinary", new FilterBinaryParseElement()).put("filter_binary", new FilterBinaryParseElement()).put("sort", new SortParseElement()).put("trackScores", new TrackScoresParseElement()).put("track_scores", new TrackScoresParseElement()).put("min_score", new MinScoreParseElement()).put("minScore", new MinScoreParseElement()).put("timeout", new TimeoutParseElement()).put("terminate_after", new TerminateAfterParseElement()).put("profile", new ProfileParseElement()).putAll(aggregationPhase.parseElements()).putAll(suggestPhase.parseElements()).putAll(rescorePhase.parseElements());
         return parseElements.build();
     }
 
@@ -129,8 +109,7 @@ public class QueryPhase implements SearchPhase {
             // sort by score
             // queries that return constant scores will return docs in index
             // order since Lucene tie-breaks on the doc id
-            return query.getClass() == ConstantScoreQuery.class
-                    || query.getClass() == MatchAllDocsQuery.class;
+            return query.getClass() == ConstantScoreQuery.class || query.getClass() == MatchAllDocsQuery.class;
         } else {
             return Sort.INDEXORDER.equals(sort);
         }
@@ -139,6 +118,7 @@ public class QueryPhase implements SearchPhase {
     /**
      * In a package-private method so that it can be tested without having to
      * wire everything (mapperService, etc.)
+     *
      * @return whether the rescoring phase should be executed
      */
     static boolean execute(SearchContext searchContext, final IndexSearcher searcher) throws QueryPhaseExecutionException {
@@ -205,10 +185,7 @@ public class QueryPhase implements SearchPhase {
                             // now this gets interesting: since we sort in index-order, we can directly
                             // skip to the desired doc and stop collecting after ${size} matches
                             if (scrollContext.lastEmittedDoc != null) {
-                                BooleanQuery bq = new BooleanQuery.Builder()
-                                    .add(query, BooleanClause.Occur.MUST)
-                                    .add(new MinDocQuery(lastEmittedDoc.doc + 1), BooleanClause.Occur.FILTER)
-                                    .build();
+                                BooleanQuery bq = new BooleanQuery.Builder().add(query, BooleanClause.Occur.MUST).add(new MinDocQuery(lastEmittedDoc.doc + 1), BooleanClause.Occur.FILTER).build();
                                 query = bq;
                             }
                             searchContext.terminateAfter(numDocs);
@@ -223,8 +200,7 @@ public class QueryPhase implements SearchPhase {
                 }
                 assert numDocs > 0;
                 if (searchContext.sort() != null) {
-                    topDocsCollector = TopFieldCollector.create(searchContext.sort(), numDocs,
-                            (FieldDoc) lastEmittedDoc, true, searchContext.trackScores(), searchContext.trackScores());
+                    topDocsCollector = TopFieldCollector.create(searchContext.sort(), numDocs, (FieldDoc) lastEmittedDoc, true, searchContext.trackScores(), searchContext.trackScores());
                 } else {
                     rescore = !searchContext.rescore().isEmpty();
                     for (RescoreSearchContext rescoreContext : searchContext.rescore()) {
@@ -253,15 +229,15 @@ public class QueryPhase implements SearchPhase {
                                 topDocs.setMaxScore(scrollContext.maxScore);
                             }
                             switch (searchType) {
-                            case QUERY_AND_FETCH:
-                            case DFS_QUERY_AND_FETCH:
-                                // for (DFS_)QUERY_AND_FETCH, we already know the last emitted doc
-                                if (topDocs.scoreDocs.length > 0) {
-                                    // set the last emitted doc
-                                    scrollContext.lastEmittedDoc = topDocs.scoreDocs[topDocs.scoreDocs.length - 1];
-                                }
-                            default:
-                                break;
+                                case QUERY_AND_FETCH:
+                                case DFS_QUERY_AND_FETCH:
+                                    // for (DFS_)QUERY_AND_FETCH, we already know the last emitted doc
+                                    if (topDocs.scoreDocs.length > 0) {
+                                        // set the last emitted doc
+                                        scrollContext.lastEmittedDoc = topDocs.scoreDocs[topDocs.scoreDocs.length - 1];
+                                    }
+                                default:
+                                    break;
                             }
                         }
                         return topDocs;
@@ -275,8 +251,7 @@ public class QueryPhase implements SearchPhase {
                 // throws Lucene.EarlyTerminationException when given count is reached
                 collector = Lucene.wrapCountBasedEarlyTerminatingCollector(collector, searchContext.terminateAfter());
                 if (doProfile) {
-                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_TERMINATE_AFTER_COUNT,
-                            Collections.singletonList((InternalProfileCollector) child));
+                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_TERMINATE_AFTER_COUNT, Collections.singletonList((InternalProfileCollector) child));
                 }
             }
 
@@ -288,8 +263,7 @@ public class QueryPhase implements SearchPhase {
                 final Weight filterWeight = searcher.createNormalizedWeight(searchContext.parsedPostFilter().query(), false);
                 collector = new FilteredCollector(collector, filterWeight);
                 if (doProfile) {
-                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_POST_FILTER,
-                            Collections.singletonList((InternalProfileCollector) child));
+                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_POST_FILTER, Collections.singletonList((InternalProfileCollector) child));
                 }
             }
 
@@ -306,6 +280,7 @@ public class QueryPhase implements SearchPhase {
                     public InternalProfileCollector get(int index) {
                         return (InternalProfileCollector) subCollectors.get(index);
                     }
+
                     @Override
                     public int size() {
                         return subCollectors.size();
@@ -319,8 +294,7 @@ public class QueryPhase implements SearchPhase {
                 final Collector child = collector;
                 collector = new MinimumScoreCollector(collector, searchContext.minimumScore());
                 if (doProfile) {
-                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_MIN_SCORE,
-                            Collections.singletonList((InternalProfileCollector) child));
+                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_MIN_SCORE, Collections.singletonList((InternalProfileCollector) child));
                 }
             }
 
@@ -371,8 +345,7 @@ public class QueryPhase implements SearchPhase {
                 // throws TimeLimitingCollector.TimeExceededException when timeout has reached
                 collector = Lucene.wrapTimeLimitingCollector(collector, searchContext.timeEstimateCounter(), searchContext.timeoutInMillis());
                 if (doProfile) {
-                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_TIMEOUT,
-                            Collections.singletonList((InternalProfileCollector) child));
+                    collector = new InternalProfileCollector(collector, CollectorResult.REASON_SEARCH_TIMEOUT, Collections.singletonList((InternalProfileCollector) child));
                 }
             }
 

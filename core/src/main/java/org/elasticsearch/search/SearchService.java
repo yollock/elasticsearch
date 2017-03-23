@@ -164,9 +164,7 @@ public class SearchService extends AbstractLifecycleComponent<SearchService> {
     private final ParseFieldMatcher parseFieldMatcher;
 
     @Inject
-    public SearchService(Settings settings, NodeSettingsService nodeSettingsService, ClusterService clusterService, IndicesService indicesService,IndicesWarmer indicesWarmer, ThreadPool threadPool,
-                         ScriptService scriptService, PageCacheRecycler pageCacheRecycler, BigArrays bigArrays, DfsPhase dfsPhase, QueryPhase queryPhase, FetchPhase fetchPhase,
-                         IndicesRequestCache indicesQueryCache) {
+    public SearchService(Settings settings, NodeSettingsService nodeSettingsService, ClusterService clusterService, IndicesService indicesService, IndicesWarmer indicesWarmer, ThreadPool threadPool, ScriptService scriptService, PageCacheRecycler pageCacheRecycler, BigArrays bigArrays, DfsPhase dfsPhase, QueryPhase queryPhase, FetchPhase fetchPhase, IndicesRequestCache indicesQueryCache) {
         super(settings);
         this.parseFieldMatcher = new ParseFieldMatcher(settings);
         this.threadPool = threadPool;
@@ -363,8 +361,7 @@ public class SearchService extends AbstractLifecycleComponent<SearchService> {
     /**
      * Try to load the query results from the cache or execute the query phase directly if the cache cannot be used.
      */
-    private void loadOrExecuteQueryPhase(final ShardSearchRequest request, final SearchContext context,
-            final QueryPhase queryPhase) throws Exception {
+    private void loadOrExecuteQueryPhase(final ShardSearchRequest request, final SearchContext context, final QueryPhase queryPhase) throws Exception {
         final boolean canCache = indicesQueryCache.canCache(request, context);
         if (canCache) {
             indicesQueryCache.loadIntoContext(request, context, queryPhase);
@@ -795,8 +792,7 @@ public class SearchService extends AbstractLifecycleComponent<SearchService> {
                     } catch (ElasticsearchParseException epe) {
                         //This was an non-nested template, the parse failure was due to this, it is safe to assume this refers to a file
                         //for backwards compatibility and keep going
-                        template = new Template(template.getScript(), ScriptService.ScriptType.FILE, MustacheScriptEngineService.NAME,
-                                null, template.getParams());
+                        template = new Template(template.getScript(), ScriptService.ScriptType.FILE, MustacheScriptEngineService.NAME, null, template.getParams());
                         ExecutableScript executable = this.scriptService.executable(template, ScriptContext.Standard.SEARCH, searchContext, Collections.<String, String>emptyMap());
                         processedQuery = (BytesReference) executable.run();
                     }
@@ -805,10 +801,8 @@ public class SearchService extends AbstractLifecycleComponent<SearchService> {
                             Template innerTemplate = TemplateQueryParser.parse(parser, searchContext.parseFieldMatcher());
                             if (hasLength(innerTemplate.getScript()) && !innerTemplate.getType().equals(ScriptService.ScriptType.INLINE)) {
                                 //An inner template referring to a filename or id
-                                template = new Template(innerTemplate.getScript(), innerTemplate.getType(),
-                                        MustacheScriptEngineService.NAME, null, template.getParams());
-                                ExecutableScript executable = this.scriptService.executable(template, ScriptContext.Standard.SEARCH,
-                                        searchContext, Collections.<String, String>emptyMap());
+                                template = new Template(innerTemplate.getScript(), innerTemplate.getType(), MustacheScriptEngineService.NAME, null, template.getParams());
+                                ExecutableScript executable = this.scriptService.executable(template, ScriptContext.Standard.SEARCH, searchContext, Collections.<String, String>emptyMap());
                                 processedQuery = (BytesReference) executable.run();
                             }
                         } catch (ScriptParseException e) {
@@ -1168,8 +1162,7 @@ public class SearchService extends AbstractLifecycleComponent<SearchService> {
                         SearchContext context = null;
                         try {
                             long now = System.nanoTime();
-                            ShardSearchRequest request = new ShardSearchLocalRequest(indexShard.shardId(), indexMetaData.getNumberOfShards(),
-                                    SearchType.QUERY_THEN_FETCH, entry.source(), entry.types(), entry.requestCache());
+                            ShardSearchRequest request = new ShardSearchLocalRequest(indexShard.shardId(), indexMetaData.getNumberOfShards(), SearchType.QUERY_THEN_FETCH, entry.source(), entry.types(), entry.requestCache());
                             context = createContext(request, warmerContext.searcher());
                             context.incRef();
                             // if we use sort, we need to do query to sort on it and load relevant field data

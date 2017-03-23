@@ -45,8 +45,24 @@ import org.elasticsearch.common.xcontent.XContentBuilderString;
 import org.elasticsearch.node.settings.NodeSettingsService;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,10 +97,7 @@ public class ThreadPool extends AbstractComponent {
     }
 
     public enum ThreadPoolType {
-        CACHED("cached"),
-        DIRECT("direct"),
-        FIXED("fixed"),
-        SCALING("scaling");
+        CACHED("cached"), DIRECT("direct"), FIXED("fixed"), SCALING("scaling");
 
         private final String type;
 
@@ -264,7 +277,7 @@ public class ThreadPool extends AbstractComponent {
     }
 
     public void setNodeSettingsService(NodeSettingsService nodeSettingsService) {
-        if(settingsListenerIsSet) {
+        if (settingsListenerIsSet) {
             throw new IllegalStateException("the node settings listener was set more then once");
         }
         nodeSettingsService.addListener(new ApplySettings());
@@ -350,13 +363,13 @@ public class ThreadPool extends AbstractComponent {
     /**
      * Schedules a periodic action that runs on the specified thread pool.
      *
-     * @param command the action to take
+     * @param command  the action to take
      * @param interval the delay interval
      * @param executor The name of the thread pool on which to execute this task. {@link Names#SAME} means "execute on the scheduler thread",
-     *             which there is only one of. Executing blocking or long running code on the {@link Names#SAME} thread pool should never
-     *             be done as it can cause issues with the cluster
+     *                 which there is only one of. Executing blocking or long running code on the {@link Names#SAME} thread pool should never
+     *                 be done as it can cause issues with the cluster
      * @return a {@link Cancellable} that can be used to cancel the subsequent runs of the command. If the command is running, it will
-     *         not be interrupted.
+     * not be interrupted.
      */
     public Cancellable scheduleWithFixedDelay(Runnable command, TimeValue interval, String executor) {
         return new ReschedulingRunnable(command, interval, executor, this);
@@ -367,14 +380,14 @@ public class ThreadPool extends AbstractComponent {
      * context of the calling thread you may call <code>threadPool.getThreadContext().preserveContext</code> on the runnable before passing
      * it to this method.
      *
-     * @param delay delay before the task executes
+     * @param delay    delay before the task executes
      * @param executor the name of the thread pool on which to execute this task. SAME means "execute on the scheduler thread" which changes the
-     *        meaning of the ScheduledFuture returned by this method. In that case the ScheduledFuture will complete only when the command
-     *        completes.
-     * @param command the command to run
+     *                 meaning of the ScheduledFuture returned by this method. In that case the ScheduledFuture will complete only when the command
+     *                 completes.
+     * @param command  the command to run
      * @return a ScheduledFuture who's get will return when the task is has been added to its target thread pool and throw an exception if
-     *         the task is canceled before it was added to its target thread pool. Once the task has been added to its target thread pool
-     *         the ScheduledFuture will cannot interact with it.
+     * the task is canceled before it was added to its target thread pool. Once the task has been added to its target thread pool
+     * the ScheduledFuture will cannot interact with it.
      * @throws EsRejectedExecutionException if the task cannot be scheduled for execution
      */
     public ScheduledFuture<?> schedule(TimeValue delay, String executor, Runnable command) {
@@ -564,8 +577,7 @@ public class ThreadPool extends AbstractComponent {
             // too many segments written, too frequently, too much merging, etc:
             // TODO: I would love to be loud here (throw an exception if you ask for a too-big size), but I think this is dangerous
             // because on upgrade this setting could be in cluster state and hard for the user to correct?
-            logger.warn("requested thread pool size [{}] for [{}] is too large; setting to maximum [{}] instead",
-                        size, name, availableProcessors);
+            logger.warn("requested thread pool size [{}] for [{}] is too large; setting to maximum [{}] instead", size, name, availableProcessors);
             size = availableProcessors;
         }
 
@@ -956,6 +968,7 @@ public class ThreadPool extends AbstractComponent {
     }
 
     public static ThreadPoolTypeSettingsValidator THREAD_POOL_TYPE_SETTINGS_VALIDATOR = new ThreadPoolTypeSettingsValidator();
+
     private static class ThreadPoolTypeSettingsValidator implements Validator {
         @Override
         public String validate(String setting, String value, ClusterState clusterState) {
@@ -975,13 +988,7 @@ public class ThreadPool extends AbstractComponent {
                 if (defaultThreadPoolType.equals(threadPoolType)) {
                     return null;
                 } else {
-                    return String.format(
-                            Locale.ROOT,
-                            "thread pool type for [%s] can only be updated to [%s] but was [%s]",
-                            threadPool,
-                            defaultThreadPoolType.getType(),
-                            threadPoolType.getType()
-                    );
+                    return String.format(Locale.ROOT, "thread pool type for [%s] can only be updated to [%s] but was [%s]", threadPool, defaultThreadPoolType.getType(), threadPoolType.getType());
                 }
             }
 
@@ -1000,6 +1007,7 @@ public class ThreadPool extends AbstractComponent {
 
         /**
          * Check if the execution has been cancelled
+         *
          * @return true if cancelled
          */
         boolean isCancelled();
@@ -1009,7 +1017,7 @@ public class ThreadPool extends AbstractComponent {
      * This class encapsulates the scheduling of a {@link Runnable} that needs to be repeated on a interval. For example, checking a value
      * for cleanup every second could be done by passing in a Runnable that can perform the check and the specified interval between
      * executions of this runnable. <em>NOTE:</em> the runnable is only rescheduled to run again after completion of the runnable.
-     *
+     * <p>
      * For this class, <i>completion</i> means that the call to {@link Runnable#run()} returned or an exception was thrown and caught. In
      * case of an exception, this class will log the exception and reschedule the runnable for its next execution. This differs from the
      * {@link ScheduledThreadPoolExecutor#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)} semantics as an exception there would
@@ -1027,9 +1035,9 @@ public class ThreadPool extends AbstractComponent {
         /**
          * Creates a new rescheduling runnable and schedules the first execution to occur after the interval specified
          *
-         * @param runnable the {@link Runnable} that should be executed periodically
-         * @param interval the time interval between executions
-         * @param executor the executor where this runnable should be scheduled to run
+         * @param runnable   the {@link Runnable} that should be executed periodically
+         * @param interval   the time interval between executions
+         * @param executor   the executor where this runnable should be scheduled to run
          * @param threadPool the {@link ThreadPool} instance to use for scheduling
          */
         ReschedulingRunnable(Runnable runnable, TimeValue interval, String executor, ThreadPool threadPool) {
@@ -1085,8 +1093,7 @@ public class ThreadPool extends AbstractComponent {
     }
 
     public static boolean assertNotScheduleThread(String reason) {
-        assert Thread.currentThread().getName().contains("scheduler") == false :
-            "Expected current thread [" + Thread.currentThread() + "] to not be the scheduler thread. Reason: [" + reason + "]";
+        assert Thread.currentThread().getName().contains("scheduler") == false : "Expected current thread [" + Thread.currentThread() + "] to not be the scheduler thread. Reason: [" + reason + "]";
         return true;
     }
 }

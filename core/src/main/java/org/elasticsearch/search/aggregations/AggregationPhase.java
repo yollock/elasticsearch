@@ -62,14 +62,7 @@ public class AggregationPhase implements SearchPhase {
 
     @Override
     public Map<String, ? extends SearchParseElement> parseElements() {
-        return ImmutableMap.<String, SearchParseElement>builder()
-                .put("aggregations", parseElement)
-                .put("aggs", parseElement)
-                .put("aggregations_binary", binaryParseElement)
-                .put("aggregationsBinary", binaryParseElement)
-                .put("aggs_binary", binaryParseElement)
-                .put("aggsBinary", binaryParseElement)
-                .build();
+        return ImmutableMap.<String, SearchParseElement>builder().put("aggregations", parseElement).put("aggs", parseElement).put("aggregations_binary", binaryParseElement).put("aggregationsBinary", binaryParseElement).put("aggs_binary", binaryParseElement).put("aggsBinary", binaryParseElement).build();
     }
 
     @Override
@@ -91,7 +84,7 @@ public class AggregationPhase implements SearchPhase {
                 context.aggregations().aggregators(aggregators);
                 if (!collectors.isEmpty()) {
                     Collector collector = BucketCollector.wrap(collectors);
-                    ((BucketCollector)collector).preCollection();
+                    ((BucketCollector) collector).preCollection();
                     if (context.getProfilers() != null) {
                         // TODO: report on child aggs as well
                         List<InternalProfileCollector> emptyList = Collections.emptyList();
@@ -132,10 +125,7 @@ public class AggregationPhase implements SearchPhase {
             Query searchFilter = context.searchFilter(context.types());
 
             if (searchFilter != null) {
-                BooleanQuery filtered = new BooleanQuery.Builder()
-                    .add(query, Occur.MUST)
-                    .add(searchFilter, Occur.FILTER)
-                    .build();
+                BooleanQuery filtered = new BooleanQuery.Builder().add(query, Occur.MUST).add(searchFilter, Occur.FILTER).build();
                 query = filtered;
             }
             try {
@@ -145,8 +135,7 @@ public class AggregationPhase implements SearchPhase {
                 } else {
                     // TODO: report on sub collectors
                     List<InternalProfileCollector> emptyList = Collections.emptyList();
-                    InternalProfileCollector profileCollector = new InternalProfileCollector(
-                            globalsCollector, CollectorResult.REASON_AGGREGATION_GLOBAL, emptyList);
+                    InternalProfileCollector profileCollector = new InternalProfileCollector(globalsCollector, CollectorResult.REASON_AGGREGATION_GLOBAL, emptyList);
                     collector = profileCollector;
                     // start a new profile with this collector
                     context.getProfilers().addProfiler().setCollector(profileCollector);
@@ -177,9 +166,7 @@ public class AggregationPhase implements SearchPhase {
                 if (pipelineAggregator instanceof SiblingPipelineAggregator) {
                     siblingPipelineAggregators.add((SiblingPipelineAggregator) pipelineAggregator);
                 } else {
-                    throw new AggregationExecutionException("Invalid pipeline aggregation named [" + pipelineAggregator.name()
-                            + "] of type [" + pipelineAggregator.type().name()
-                            + "]. Only sibling pipeline aggregations are allowed at the top level");
+                    throw new AggregationExecutionException("Invalid pipeline aggregation named [" + pipelineAggregator.name() + "] of type [" + pipelineAggregator.type().name() + "]. Only sibling pipeline aggregations are allowed at the top level");
                 }
             }
             context.queryResult().pipelineAggregators(siblingPipelineAggregators);

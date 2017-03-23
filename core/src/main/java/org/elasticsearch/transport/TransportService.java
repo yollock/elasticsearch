@@ -100,7 +100,9 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
     volatile String[] tracelLogExclude;
     private final ApplySettings settingsListener = new ApplySettings();
 
-    /** if set will call requests sent to this id to shortcut and executed locally */
+    /**
+     * if set will call requests sent to this id to shortcut and executed locally
+     */
     volatile DiscoveryNode localNode = null;
 
     public TransportService(Transport transport, ThreadPool threadPool) {
@@ -159,8 +161,7 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
             if (newTracerLogInclude == TransportService.this.tracerLogInclude && newTracerLogExclude == TransportService.this.tracelLogExclude) {
                 return;
             }
-            if (Arrays.equals(newTracerLogInclude, TransportService.this.tracerLogInclude) &&
-                    Arrays.equals(newTracerLogExclude, TransportService.this.tracelLogExclude)) {
+            if (Arrays.equals(newTracerLogInclude, TransportService.this.tracerLogInclude) && Arrays.equals(newTracerLogExclude, TransportService.this.tracelLogExclude)) {
                 return;
             }
             TransportService.this.tracerLogInclude = newTracerLogInclude;
@@ -282,25 +283,21 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
         connectionListeners.remove(listener);
     }
 
-    public <T extends TransportResponse> TransportFuture<T> submitRequest(DiscoveryNode node, String action, TransportRequest request,
-                                                                          TransportResponseHandler<T> handler) throws TransportException {
+    public <T extends TransportResponse> TransportFuture<T> submitRequest(DiscoveryNode node, String action, TransportRequest request, TransportResponseHandler<T> handler) throws TransportException {
         return submitRequest(node, action, request, TransportRequestOptions.EMPTY, handler);
     }
 
-    public <T extends TransportResponse> TransportFuture<T> submitRequest(DiscoveryNode node, String action, TransportRequest request,
-                                                                          TransportRequestOptions options, TransportResponseHandler<T> handler) throws TransportException {
+    public <T extends TransportResponse> TransportFuture<T> submitRequest(DiscoveryNode node, String action, TransportRequest request, TransportRequestOptions options, TransportResponseHandler<T> handler) throws TransportException {
         PlainTransportFuture<T> futureHandler = new PlainTransportFuture<>(handler);
         sendRequest(node, action, request, options, futureHandler);
         return futureHandler;
     }
 
-    public <T extends TransportResponse> void sendRequest(final DiscoveryNode node, final String action, final TransportRequest request,
-                                                          final TransportResponseHandler<T> handler) {
+    public <T extends TransportResponse> void sendRequest(final DiscoveryNode node, final String action, final TransportRequest request, final TransportResponseHandler<T> handler) {
         sendRequest(node, action, request, TransportRequestOptions.EMPTY, handler);
     }
 
-    public <T extends TransportResponse> void sendRequest(final DiscoveryNode node, final String action, final TransportRequest request,
-                                                          final TransportRequestOptions options, TransportResponseHandler<T> handler) {
+    public <T extends TransportResponse> void sendRequest(final DiscoveryNode node, final String action, final TransportRequest request, final TransportRequestOptions options, TransportResponseHandler<T> handler) {
         if (node == null) {
             throw new IllegalStateException("can't send request to a null node");
         }
@@ -344,10 +341,12 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
                         // if we get rejected during node shutdown we don't wanna bubble it up
                         logger.debug("failed to notify response handler on rejection", t);
                     }
+
                     @Override
                     public void onFailure(Throwable t) {
                         logger.warn("failed to notify response handler on exception", t);
                     }
+
                     @Override
                     protected void doRun() throws Exception {
                         holderToNotify.handler().handleException(sendRequestException);
@@ -446,7 +445,10 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
      * @param executor       The executor the request handling will be executed on
      * @param handler        The handler itself that implements the request handling
      */
-    public <Request extends TransportRequest> void registerRequestHandler(String action, Callable<Request> requestFactory, String executor, TransportRequestHandler<Request> handler) {
+    public <Request extends TransportRequest> void registerRequestHandler(String action, //
+                                                                          Callable<Request> requestFactory, //
+                                                                          String executor, TransportRequestHandler<Request> handler //
+    ) {
         RequestHandlerRegistry<Request> reg = new RequestHandlerRegistry<>(action, requestFactory, taskManager, handler, executor, false, true);
         registerRequestHandler(reg);
     }
@@ -461,7 +463,12 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
      * @param canTripCircuitBreaker Check the request size and raise an exception in case the limit is breached.
      * @param handler               The handler itself that implements the request handling
      */
-    public <Request extends TransportRequest> void registerRequestHandler(String action, Callable<Request> requestFactory, String executor, boolean forceExecution, boolean canTripCircuitBreaker, TransportRequestHandler<Request> handler) {
+    public <Request extends TransportRequest> void registerRequestHandler(String action, //
+                                                                          Callable<Request> requestFactory, //
+                                                                          String executor, //
+                                                                          boolean forceExecution, //
+                                                                          boolean canTripCircuitBreaker, //
+                                                                          TransportRequestHandler<Request> handler) {
         RequestHandlerRegistry<Request> reg = new RequestHandlerRegistry<>(action, requestFactory, taskManager, handler, executor, forceExecution, canTripCircuitBreaker);
         registerRequestHandler(reg);
     }
@@ -477,7 +484,13 @@ public class TransportService extends AbstractLifecycleComponent<TransportServic
      * @param canTripCircuitBreaker Check the request size and raise an exception in case the limit is breached.
      * @param handler               The handler itself that implements the request handling
      */
-    public <Request extends TransportRequest> void registerRequestHandler(String action, Class<Request> request, String executor, boolean forceExecution, boolean canTripCircuitBreaker, TransportRequestHandler<Request> handler) {
+    public <Request extends TransportRequest> void registerRequestHandler(String action, //
+                                                                          Class<Request> request, //
+                                                                          String executor, //
+                                                                          boolean forceExecution, //
+                                                                          boolean canTripCircuitBreaker, //
+                                                                          TransportRequestHandler<Request> handler //
+    ) {
         RequestHandlerRegistry<Request> reg = new RequestHandlerRegistry<>(action, request, taskManager, handler, executor, forceExecution, canTripCircuitBreaker);
         registerRequestHandler(reg);
     }
